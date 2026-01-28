@@ -71,16 +71,9 @@
             ]
           },
           {
-            "group": "API Documentation",
-            "openapi": "api-reference/endpoint/openapi.json"
-          },
-          {
-            "group": "Cosmos API",
-            "openapi": "api-reference/endpoint/cosmos.yml"
-          },
-          {
-            "group": "Tendermint API",
-            "openapi": "api-reference/endpoint/tendermint.yaml"
+            "group": "Endpoint examples",
+            "openapi": "/api-reference/endpoint/cosmos.yml",
+            "pages": []
           }
         ]
       },
