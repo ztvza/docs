@@ -72,6 +72,7 @@
                 "openapi": "/api-reference/endpoint/cosmos.yml"
               },
               {
+                "group": "Tendermint API",
                 "openapi": "/api-reference/endpoint/tendermint.yaml"
               }
             ]

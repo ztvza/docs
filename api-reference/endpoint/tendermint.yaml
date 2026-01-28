@@ -6,9 +6,6 @@ info:
 servers:
   - url: https://akt-tendermint.nownodes.io
 
-tags:
-  - name: Tendermint
-
 security:
   - api-keyAuth: []
 
