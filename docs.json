@@ -62,18 +62,26 @@
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Docs",
         "groups": [
+          {
+            "group": "AKR",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/cosmos.yml"
+              },
+              {
+                "group": "Tendermint",
+                "openapi": "/api-reference/endpoint/tendermint.yaml"
+              }
+            ]
+          },
           {
             "group": "API documentation",
             "pages": [
               "api-reference/introduction"
             ]
-          },
-          {
-            "group": "Endpoint examples",
-            "openapi": "/api-reference/endpoint/cosmos.yml",
-            "pages": []
           }
         ]
       },
