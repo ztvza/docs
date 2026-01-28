@@ -72,7 +72,10 @@
           },
           {
             "group": "Endpoint examples",
-            "openapi": "/api-reference/endpoint/cosmos.yml",
+            "openapi": [
+              "/api-reference/endpoint/cosmos.yml",
+              "/api-reference/endpoint/tendermint.yaml"
+            ],
             "pages": []
           }
         ]
