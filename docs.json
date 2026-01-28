@@ -71,12 +71,16 @@
             ]
           },
           {
-            "group": "Endpoint examples",
-            "openapi": [
-              "/api-reference/endpoint/cosmos.yml",
-              "/api-reference/endpoint/tendermint.yaml"
-            ],
-            "pages": []
+            "group": "API Documentation",
+            "openapi": "/openapi.json"
+          },
+          {
+            "group": "Cosmos API",
+            "openapi": "/cosmos.yml"
+          },
+          {
+            "group": "Tendermint API",
+            "openapi": "/tendermint.yaml"
           }
         ]
       },
