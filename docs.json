@@ -72,15 +72,15 @@
           },
           {
             "group": "API Documentation",
-            "openapi": "/openapi.json"
+            "openapi": "api-reference/endpoint/openapi.json"
           },
           {
             "group": "Cosmos API",
-            "openapi": "/cosmos.yml"
+            "openapi": "api-reference/endpoint/cosmos.yml"
           },
           {
             "group": "Tendermint API",
-            "openapi": "/tendermint.yaml"
+            "openapi": "api-reference/endpoint/tendermint.yaml"
           }
         ]
       },
