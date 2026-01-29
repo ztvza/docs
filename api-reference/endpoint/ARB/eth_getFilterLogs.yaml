@@ -12,10 +12,6 @@ security:
 paths:
   /:
     post:
-      tags:
-        - eth_getFilterLogs
-      summary: Get Filter Logs
-      operationId: ethGetFilterLogs
       description: |
         Returns all logs matching a filter with the specified filter ID.
         The filter must have been previously created with eth_newFilter.
