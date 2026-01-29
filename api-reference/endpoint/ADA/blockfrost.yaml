@@ -1,0 +1,2611 @@
+openapi: 3.0.3
+
+info:
+  title: Blockfrost Cardano API
+  version: 1.0.0
+  description: |
+    Blockfrost API for Cardano blockchain — Health endpoints.
+    These endpoints allow clients to check the status of the Blockfrost service and compare system clocks.
+
+servers:
+  - url: https://ada-blockfrost.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /health:
+    get:
+      summary: API Health Status
+      description: Check whether the Blockfrost API is responding and synced with the Cardano blockchain.
+      operationId: getHealthStatus
+      tags:
+        - Health
+
+      responses:
+        "200":
+          description: The service is healthy and synchronized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_healthy:
+                    type: boolean
+                    description: Whether the service is up and synchronized with the blockchain
+                    example: true
+        "500":
+          description: Service unavailable or internal error
+  /health/clock:
+    get:
+      summary: API Clock Synchronization
+      description: |
+        Returns the current UNIX time (in seconds) from the Blockfrost server.
+        Can be used to check time drift between your system and Blockfrost servers.
+      operationId: getHealthClock
+      tags:
+        - Health
+
+      responses:
+        "200":
+          description: Current server UNIX time
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  server_time:
+                    type: integer
+                    format: int64
+                    description: Current server UNIX timestamp (UTC seconds)
+                    example: 1658168380
+        "500":
+          description: Failed to get time from the server
+  /accounts/{address}:
+    get:
+      summary: Account information
+      description: Returns information about a specific stake address.
+      operationId: getAccount
+      tags:
+        - Accounts
+
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Bech32 stake address
+      responses:
+        "200":
+          description: Stake account info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stake_address:
+                    type: string
+                    description: Bech32 stake address
+                    example: "stake1u9...0ef"
+                  active:
+                    type: boolean
+                    description: Whether the account is active
+                    example: true
+                  active_epoch:
+                    type: integer
+                    description: Epoch of first activation
+                    example: 210
+                  controlled_amount:
+                    type: string
+                    description: Total ADA controlled (in Lovelace)
+                    example: "5000000000"
+                  rewards_sum:
+                    type: string
+                    description: Total rewards (in Lovelace)
+                    example: "120000000"
+                  withdrawals_sum:
+                    type: string
+                    description: Total withdrawals (in Lovelace)
+                    example: "110000000"
+                  reserves_sum:
+                    type: string
+                    description: Sum of MIRs from reserves
+                    example: "1000000"
+                  treasury_sum:
+                    type: string
+                    description: Sum of MIRs from treasury
+                    example: "200000"
+                  withdrawable_amount:
+                    type: string
+                    description: ADA available for withdrawal (Lovelace)
+                    example: "10000000"
+                  pool_id:
+                    type: string
+                    nullable: true
+                    description: Delegated pool ID (if any)
+                    example: "pool1pu5...pqqq"
+                  serialised_size:
+                    type: integer
+                    example: 120
+                    description: Serialized size of the account info in bytes
+
+  /accounts/{address}/rewards:
+    get:
+      summary: Account reward history
+      description: List of all rewards for a specific stake address.
+      operationId: getAccountRewards
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: List of rewards by epoch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    epoch:
+                      type: integer
+                      example: 215
+                      description: Epoch number
+                    amount:
+                      type: string
+                      example: "5000000"
+                      description: Reward amount in Lovelace
+                    pool_id:
+                      type: string
+                      description: Pool that generated the reward
+                      example: "pool1pu5...pqqq"
+                    type:
+                      type: string
+                      description: Reward type (leader, member, etc.)
+                      example: "member"
+
+  /accounts/{address}/registrations:
+    get:
+      summary: Account registration history
+      description: Stake key registration and deregistration history
+      operationId: getAccountRegistrations
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: Registration events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tx_hash:
+                      type: string
+                      description: Transaction hash
+                      example: "abc123..."
+                    action:
+                      type: string
+                      description: "`registered` or `deregistered`"
+                      example: "registered"
+
+  /accounts/{address}/withdrawals:
+    get:
+      summary: Account withdrawals
+      description: List of withdrawals from the stake address.
+      operationId: getAccountWithdrawals
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: List of withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    amount:
+                      type: string
+                      example: "5000000"
+                      description: Withdrawal amount in Lovelace
+                    tx_hash:
+                      type: string
+                      example: "txhash123..."
+                      description: Transaction hash
+
+  /accounts/{address}/mirs:
+    get:
+      summary: Account MIRs
+      description: List of Move Instantaneous Rewards (MIRs) for a stake address.
+      operationId: getAccountMIRs
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: List of MIR entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    amount:
+                      type: string
+                      example: "1000000"
+                      description: MIR amount in Lovelace
+                    tx_hash:
+                      type: string
+                      example: "txhash456..."
+                      description: Transaction hash
+
+  /accounts/{address}/addresses:
+    get:
+      summary: Associated addresses
+      description: List of all UTXO addresses controlled by a stake key
+      operationId: getAccountAddresses
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: List of associated addresses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: "addr1q..."
+                      description: Associated address
+
+  /accounts/{address}/addresses/assets:
+    get:
+      summary: Assets in associated addresses
+      description: List of assets (native tokens) held across all controlled addresses.
+      operationId: getAccountAddressAssets
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: List of assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    unit:
+                      type: string
+                      description: Asset unit (policy + hex name)
+                      example: "b0d9...445"
+                    quantity:
+                      type: string
+                      description: Quantity of asset held
+                      example: "150"
+
+  /accounts/{address}/addresses/total:
+    get:
+      summary: Total balance of controlled addresses
+      description: Aggregated balance and UTXO stats of all addresses associated with the stake key.
+      operationId: getAccountAddressesTotal
+      tags:
+        - Accounts
+
+      parameters:
+        - $ref: "#/components/parameters/StakeAddress"
+      responses:
+        "200":
+          description: Totals of ADA and assets in controlled addresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address_count:
+                    type: integer
+                    description: Number of associated addresses
+                    example: 5
+                  sent_sum:
+                    type: string
+                    description: Total ADA sent from associated addresses (in Lovelace)
+                    example: "5000000"
+                  received_sum:
+                    type: string
+                    description: Total ADA received
+                    example: "10000000"
+                  tx_count:
+                    type: integer
+                    description: Number of transactions involving the addresses
+                    example: 25
+  /addresses/{address}:
+    get:
+      summary: Get address information
+      description: Returns details about a specific address.
+      operationId: getAddress
+      tags: [Addresses]
+
+      parameters:
+        - $ref: "#/components/parameters/AddressParam"
+      responses:
+        "200":
+          description: Address details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Bech32 address
+                    example: "addr1q9..."
+                  amount:
+                    type: array
+                    description: List of amounts by currency
+                    items:
+                      type: object
+                      properties:
+                        unit:
+                          type: string
+                          description: ADA (`lovelace`) or asset unit
+                          example: "lovelace"
+                        quantity:
+                          type: string
+                          description: Quantity in smallest unit (e.g. Lovelace)
+                          example: "42000000"
+                  stake_address:
+                    type: string
+                    nullable: true
+                    description: Stake address linked to this address
+                    example: "stake1ux..."
+                  type:
+                    type: string
+                    description: Address type (e.g., `shelley`, `byron`, `enterprise`, etc.)
+                    example: "shelley"
+                  script:
+                    type: boolean
+                    description: Whether this is a script address
+                    example: false
+
+  /addresses/{address}/total:
+    get:
+      summary: Get address totals
+      description: Returns total ADA received, sent, and number of UTXOs.
+      operationId: getAddressTotals
+      tags: [Addresses]
+
+      parameters:
+        - $ref: "#/components/parameters/AddressParam"
+      responses:
+        "200":
+          description: Address balance stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received_sum:
+                    type: string
+                    description: Total ADA received in Lovelace
+                    example: "7000000"
+                  sent_sum:
+                    type: string
+                    description: Total ADA sent in Lovelace
+                    example: "3000000"
+                  tx_count:
+                    type: integer
+                    description: Number of transactions involving this address
+                    example: 42
+
+  /addresses/{address}/utxos/{asset}:
+    get:
+      summary: Get UTXOs by asset
+      description: List all UTXOs at a given address containing a specific asset.
+      operationId: getAddressUtxosByAsset
+      tags: [Addresses]
+
+      parameters:
+        - $ref: "#/components/parameters/AddressParam"
+        - name: asset
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Asset unit (policy ID + hex-encoded asset name)
+      responses:
+        "200":
+          description: UTXOs containing specified asset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tx_hash:
+                      type: string
+                      description: Transaction hash
+                      example: "abcdef123..."
+                    output_index:
+                      type: integer
+                      description: UTXO output index
+                      example: 0
+                    amount:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          unit:
+                            type: string
+                            description: Asset unit
+                            example: "lovelace"
+                          quantity:
+                            type: string
+                            description: Amount in smallest unit
+                            example: "1000000"
+                    block:
+                      type: string
+                      description: Block hash containing this UTXO
+                      example: "block123abc..."
+
+  /addresses/{address}/transactions:
+    get:
+      summary: Get address transactions
+      description: Returns transactions involving the address.
+      operationId: getAddressTransactions
+      tags: [Addresses]
+
+      parameters:
+        - $ref: "#/components/parameters/AddressParam"
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+            maximum: 100
+          description: Number of transactions to return (max 100)
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Pagination page number
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort order
+      responses:
+        "200":
+          description: List of transactions involving the address
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tx_hash:
+                      type: string
+                      description: Transaction hash
+                      example: "abcdef123..."
+                    tx_index:
+                      type: integer
+                      description: Index within block
+                      example: 12
+                    block_height:
+                      type: integer
+                      description: Block height
+                      example: 654321
+  /assets:
+    get:
+      summary: List all assets
+      description: Paginated list of all native assets on the blockchain.
+      operationId: listAssets
+      tags: [Assets]
+
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/CountParam"
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: List of asset identifiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    asset:
+                      type: string
+                      example: "b0d9ab...445"
+                      description: Asset unit (policy_id + hex-encoded asset name)
+
+  /assets/{asset}:
+    get:
+      summary: Asset information
+      description: Get detailed metadata and supply info about a specific asset.
+      operationId: getAsset
+      tags: [Assets]
+
+      parameters:
+        - $ref: "#/components/parameters/AssetParam"
+      responses:
+        "200":
+          description: Asset metadata and info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  asset:
+                    type: string
+                    example: "b0d9ab...445"
+                    description: Asset unit (policy + hex name)
+                  policy_id:
+                    type: string
+                    example: "b0d9ab..."
+                    description: Minting policy ID
+                  asset_name:
+                    type: string
+                    example: "445447"
+                    description: Hex-encoded asset name
+                  fingerprint:
+                    type: string
+                    example: "asset1q..."
+                    description: CIP-14 fingerprint
+                  quantity:
+                    type: string
+                    example: "4200000"
+                    description: Total supply (on-chain quantity)
+                  initial_mint_tx_hash:
+                    type: string
+                    example: "abcd123..."
+                    description: First minting transaction hash
+                  metadata:
+                    type: object
+                    description: Optional off-chain metadata if registered
+                    properties:
+                      name:
+                        type: string
+                        example: "MyToken"
+                      description:
+                        type: string
+                        example: "Test token"
+                      ticker:
+                        type: string
+                        example: "TST"
+                      url:
+                        type: string
+                        example: "https://example.com"
+                      logo:
+                        type: string
+                        format: byte
+                        description: Base64-encoded PNG
+
+  /assets/{asset}/history:
+    get:
+      summary: Asset mint/burn history
+      description: Historical mint and burn operations of a given asset.
+      operationId: getAssetHistory
+      tags: [Assets]
+
+      parameters:
+        - $ref: "#/components/parameters/AssetParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/CountParam"
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Mint/burn events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tx_hash:
+                      type: string
+                      example: "txhash123..."
+                    amount:
+                      type: string
+                      example: "1000"
+                      description: Minted (positive) or burned (negative)
+
+  /assets/{asset}/transactions:
+    get:
+      summary: Asset transaction history
+      description: List of transactions involving this asset.
+      operationId: getAssetTransactions
+      tags: [Assets]
+
+      parameters:
+        - $ref: "#/components/parameters/AssetParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/CountParam"
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tx_hash:
+                      type: string
+                      example: "txhash123..."
+                    block_height:
+                      type: integer
+                      example: 5500000
+
+  /assets/{asset}/addresses:
+    get:
+      summary: Asset distribution
+      description: List of addresses holding the given asset.
+      operationId: getAssetAddresses
+      tags: [Assets]
+
+      parameters:
+        - $ref: "#/components/parameters/AssetParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/CountParam"
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: List of holder addresses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      example: "addr1q..."
+                    quantity:
+                      type: string
+                      example: "100000"
+                      description: Amount held
+
+  /assets/policy/{policy_id}:
+    get:
+      summary: Assets by policy
+      description: Get all assets under the same minting policy.
+      operationId: getAssetsByPolicy
+      tags: [Assets]
+
+      parameters:
+        - name: policy_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Minting policy ID
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/CountParam"
+        - $ref: "#/components/parameters/OrderParam"
+      responses:
+        "200":
+          description: Assets under policy
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    asset:
+                      type: string
+                      example: "b0d9...445"
+                    quantity:
+                      type: string
+                      example: "1000000"
+  /blocks/latest:
+    get:
+      summary: Get latest block
+      description: Returns the most recent block on the blockchain.
+      operationId: getLatestBlock
+      tags: [Blocks]
+
+      responses:
+        "200":
+          description: Latest block details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
+
+  /blocks/latest/txs:
+    get:
+      summary: Get transactions in latest block
+      description: Returns a list of transaction hashes included in the latest block.
+      operationId: getLatestBlockTxs
+      tags: [Blocks]
+
+      responses:
+        "200":
+          description: List of transaction hashes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "txhash123..."
+
+  /blocks/{block_id}:
+    get:
+      summary: Get block by ID or hash
+      description: Returns details of a specific block identified by its hash or number.
+      operationId: getBlockById
+      tags: [Blocks]
+
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Block hash or number
+      responses:
+        "200":
+          description: Block details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
+
+  /blocks/{block_id}/next:
+    get:
+      summary: Get next blocks
+      description: Returns blocks following the specified block.
+      operationId: getNextBlocks
+      tags: [Blocks]
+
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Block hash or number
+      responses:
+        "200":
+          description: List of next blocks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Block"
+
+  /blocks/{block_id}/previous:
+    get:
+      summary: Get previous blocks
+      description: Returns blocks preceding the specified block.
+      operationId: getPreviousBlocks
+      tags: [Blocks]
+
+      parameters:
+        - name: block_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Block hash or number
+      responses:
+        "200":
+          description: List of previous blocks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Block"
+
+  /blocks/slot/{slot}:
+    get:
+      summary: Get block by slot number
+      description: Returns a block for the specified slot number.
+      operationId: getBlockBySlot
+      tags: [Blocks]
+
+      parameters:
+        - name: slot
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Slot number
+      responses:
+        "200":
+          description: Block details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
+
+  /blocks/epoch/{epoch}/slot/{slot}:
+    get:
+      summary: Get block by epoch and slot
+      description: Returns a block identified by epoch number and slot within epoch.
+      operationId: getBlockByEpochSlot
+      tags: [Blocks]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+        - name: slot
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Slot number within the epoch
+      responses:
+        "200":
+          description: Block details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Block"
+
+  /blocks/{block}/txs:
+    get:
+      summary: Get transactions in a block
+      description: Returns transaction hashes included in a given block.
+      operationId: getBlockTxs
+      tags: [Blocks]
+
+      parameters:
+        - name: block
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Block hash or number
+      responses:
+        "200":
+          description: List of transaction hashes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "txhash123..."
+
+  /blocks/{block}/addresses:
+    get:
+      summary: Get addresses involved in a block
+      description: Returns all addresses that appear in transactions within the specified block.
+      operationId: getBlockAddresses
+      tags: [Blocks]
+
+      parameters:
+        - name: block
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Block hash or number
+      responses:
+        "200":
+          description: List of addresses involved in the block
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "addr1q9..."
+  /epochs/latest:
+    get:
+      summary: Get latest epoch
+      description: Returns the latest epoch number.
+      operationId: getLatestEpoch
+      tags: [Epochs]
+
+      responses:
+        "200":
+          description: Latest epoch number
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 310
+
+  /epochs/latest/parameters:
+    get:
+      summary: Get latest epoch protocol parameters
+      description: Returns the protocol parameters for the latest epoch.
+      operationId: getLatestEpochParameters
+      tags: [Epochs]
+
+      responses:
+        "200":
+          description: Protocol parameters of latest epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpochParameters"
+
+  /epochs/{epoch}/next:
+    get:
+      summary: Get next epochs
+      description: Returns the epochs following the specified epoch.
+      operationId: getNextEpochs
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+      responses:
+        "200":
+          description: List of next epochs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  example: 311
+
+  /epochs/{epoch}/previous:
+    get:
+      summary: Get previous epochs
+      description: Returns the epochs preceding the specified epoch.
+      operationId: getPreviousEpochs
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+      responses:
+        "200":
+          description: List of previous epochs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  example: 309
+
+  /epochs/{epoch}/stakes:
+    get:
+      summary: Get stake distribution for epoch
+      description: Returns stake distribution info for all pools in the specified epoch.
+      operationId: getEpochStakes
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+        - $ref: "#/components/parameters/PageParamN"
+        - $ref: "#/components/parameters/CountParamN"
+        - $ref: "#/components/parameters/OrderParamN"
+      responses:
+        "200":
+          description: List of stakes per pool
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EpochStake"
+
+  /epochs/{epoch}/stakes/{pool}:
+    get:
+      summary: Get stake for specific pool in epoch
+      description: Returns stake info for a specific pool in the given epoch.
+      operationId: getEpochStakeByPool
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+        - name: pool
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Pool ID
+      responses:
+        "200":
+          description: Stake info for pool in epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpochStake"
+
+  /epochs/{epoch}/blocks:
+    get:
+      summary: Get blocks in epoch
+      description: Returns blocks minted in the specified epoch.
+      operationId: getEpochBlocks
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+        - $ref: "#/components/parameters/PageParamN"
+        - $ref: "#/components/parameters/CountParamN"
+        - $ref: "#/components/parameters/OrderParamN"
+      responses:
+        "200":
+          description: List of blocks in epoch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlockN"
+
+  /epochs/{epoch}/blocks/{pool}:
+    get:
+      summary: Get blocks minted by pool in epoch
+      description: Returns blocks minted by a specific pool in the given epoch.
+      operationId: getEpochBlocksByPool
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+        - name: pool
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Pool ID
+        - $ref: "#/components/parameters/PageParamN"
+        - $ref: "#/components/parameters/CountParamN"
+        - $ref: "#/components/parameters/OrderParamN"
+      responses:
+        "200":
+          description: List of blocks minted by pool in epoch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BlockN"
+
+  /epochs/{epoch}/parameters:
+    get:
+      summary: Get protocol parameters for epoch
+      description: Returns protocol parameters used in the specified epoch.
+      operationId: getEpochParameters
+      tags: [Epochs]
+
+      parameters:
+        - name: epoch
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Epoch number
+      responses:
+        "200":
+          description: Protocol parameters for epoch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EpochParameters"
+  /genesis:
+    get:
+      summary: Get genesis configuration
+      description: Returns the genesis configuration used to start the Cardano blockchain.
+      operationId: getGenesis
+      tags: [Genesis]
+      responses:
+        "200":
+          description: Genesis configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Genesis"
+        "401":
+          description: Missing or invalid `project_id` header
+        "500":
+          description: Internal server error
+  /metadata/txs/labels:
+    get:
+      summary: List all transaction metadata labels
+      description: Returns a list of all used transaction metadata labels.
+      operationId: getMetadataLabels
+      tags: [Metadata]
+
+      parameters:
+        - $ref: "#/components/parameters/PageParamM"
+        - $ref: "#/components/parameters/CountParamM"
+        - $ref: "#/components/parameters/OrderParamM"
+      responses:
+        "200":
+          description: List of metadata labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MetadataLabel"
+
+  /metadata/txs/labels/{label}:
+    get:
+      summary: Get metadata content by label
+      description: Returns content of transaction metadata for a specific label.
+      operationId: getMetadataByLabel
+      tags: [Metadata]
+
+      parameters:
+        - name: label
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Metadata label (e.g. "1967")
+        - $ref: "#/components/parameters/PageParamM"
+        - $ref: "#/components/parameters/CountParamM"
+        - $ref: "#/components/parameters/OrderParamM"
+      responses:
+        "200":
+          description: List of transaction metadata content by label
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MetadataContent"
+  /network/eras:
+    get:
+      summary: Get Cardano network eras
+      description: Returns list of all Cardano network eras with their start/end epoch and slot.
+      operationId: getNetworkEras
+      tags: [Network]
+      responses:
+        "200":
+          description: List of Cardano network eras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NetworkEra"
+        "401":
+          description: Missing or invalid `project_id`
+        "500":
+          description: Internal server error
+  /pools:
+    get:
+      summary: List active stake pools
+      description: Returns a list of all currently registered and active stake pools.
+      operationId: getPools
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PageParamP"
+        - $ref: "#/components/parameters/CountParamP"
+        - $ref: "#/components/parameters/OrderParamP"
+      responses:
+        "200":
+          description: List of active stake pool IDs (Bech32 format)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: pool1pu5jljp0....
+
+  /pools/retired:
+    get:
+      summary: List retired stake pools
+      description: Returns all stake pools that have retired.
+      operationId: getRetiredPools
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PageParamP"
+        - $ref: "#/components/parameters/CountParamP"
+        - $ref: "#/components/parameters/OrderParamP"
+      responses:
+        "200":
+          description: List of retired pools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PoolRetirement"
+
+  /pools/retiring:
+    get:
+      summary: List retiring stake pools
+      description: Returns all stake pools that are scheduled to retire.
+      operationId: getRetiringPools
+      tags: [Pools]
+
+      responses:
+        "200":
+          description: List of retiring pools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PoolRetirement"
+
+  /pools/{pool_id}/metadata:
+    get:
+      summary: Get stake pool metadata
+      description: Returns metadata specified by the stake pool.
+      operationId: getPoolMetadata
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PoolIdParam"
+      responses:
+        "200":
+          description: Stake pool metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PoolMetadata"
+
+  /pools/{pool_id}/relays:
+    get:
+      summary: Get stake pool relays
+      description: Returns registered relays of a stake pool.
+      operationId: getPoolRelays
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PoolIdParam"
+      responses:
+        "200":
+          description: Stake pool relay list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relay"
+
+  /pools/{pool_id}/delegators:
+    get:
+      summary: Get stake pool delegators
+      description: List of current delegators to a pool.
+      operationId: getPoolDelegators
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PoolIdParam"
+        - $ref: "#/components/parameters/PageParamP"
+        - $ref: "#/components/parameters/CountParamP"
+        - $ref: "#/components/parameters/OrderParamP"
+      responses:
+        "200":
+          description: List of delegators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Delegator"
+
+  /pools/{pool_id}/blocks:
+    get:
+      summary: Get stake pool blocks
+      description: Returns list of block hashes minted by the given stake pool.
+      operationId: getPoolBlocks
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PoolIdParam"
+        - $ref: "#/components/parameters/PageParamP"
+        - $ref: "#/components/parameters/CountParamP"
+        - $ref: "#/components/parameters/OrderParamP"
+      responses:
+        "200":
+          description: List of block hashes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "abc123..."
+
+  /pools/{pool_id}/updates:
+    get:
+      summary: Get stake pool update history
+      description: Returns all updates to the specified stake pool.
+      operationId: getPoolUpdates
+      tags: [Pools]
+
+      parameters:
+        - $ref: "#/components/parameters/PoolIdParam"
+      responses:
+        "200":
+          description: List of stake pool update events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PoolUpdate"
+  /scripts:
+    get:
+      summary: List all scripts
+      description: Returns a list of all scripts hashes.
+      operationId: listScripts
+      tags:
+        - Scripts
+
+      parameters:
+        - $ref: "#/components/parameters/PageParamS"
+        - $ref: "#/components/parameters/CountParamS"
+        - $ref: "#/components/parameters/OrderParamS"
+      responses:
+        "200":
+          description: Array of script hashes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "d91b31d1d0f0db8..."
+
+  /scripts/{script}:
+    get:
+      summary: Get script information
+      description: Returns detailed information about a specific script.
+      operationId: getScript
+      tags:
+        - Scripts
+
+      parameters:
+        - $ref: "#/components/parameters/ScriptHashParam"
+      responses:
+        "200":
+          description: Script information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Script"
+
+  /scripts/{script}/json:
+    get:
+      summary: Get script JSON representation
+      description: Returns the JSON representation of the script.
+      operationId: getScriptJson
+      tags:
+        - Scripts
+
+      parameters:
+        - $ref: "#/components/parameters/ScriptHashParam"
+      responses:
+        "200":
+          description: Script JSON object
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  type: "PlutusV1"
+                  description: "Plutus script example"
+                  script: { ... }
+
+  /scripts/{script}/cbor:
+    get:
+      summary: Get script CBOR representation
+      description: Returns the CBOR hex-encoded representation of the script.
+      operationId: getScriptCbor
+      tags:
+        - Scripts
+
+      parameters:
+        - $ref: "#/components/parameters/ScriptHashParam"
+      responses:
+        "200":
+          description: CBOR encoded script
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "4e4d01000033222220051200120011"
+
+  /scripts/{script}/redeemers:
+    get:
+      summary: Get redeemers for script
+      description: Returns all redeemers related to the specified script.
+      operationId: getScriptRedeemers
+      tags:
+        - Scripts
+
+      parameters:
+        - $ref: "#/components/parameters/ScriptHashParam"
+        - $ref: "#/components/parameters/PageParamS"
+        - $ref: "#/components/parameters/CountParamS"
+        - $ref: "#/components/parameters/OrderParamS"
+      responses:
+        "200":
+          description: List of redeemers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Redeemer"
+
+  /scripts/datum/{script}/cbor:
+    get:
+      summary: Get CBOR datum for script
+      description: Returns the CBOR hex-encoded datum associated with the script.
+      operationId: getScriptDatumCbor
+      tags:
+        - Scripts
+
+      parameters:
+        - name: script
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Script hash
+      responses:
+        "200":
+          description: CBOR encoded datum
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "a10082825820a4c..."
+  /txs/{tx}:
+    get:
+      summary: Get transaction info
+      description: Returns detailed information about a transaction by its hash.
+      operationId: getTransaction
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: Transaction details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /txs/{tx}/stakes:
+    get:
+      summary: Get transaction stakes
+      description: Returns all stake certificates included in the transaction.
+      operationId: getTransactionStakes
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of stake certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StakeCertificate"
+
+  /txs/{tx}/delegations:
+    get:
+      summary: Get transaction delegations
+      description: Returns delegation certificates included in the transaction.
+      operationId: getTransactionDelegations
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of delegations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Delegation"
+
+  /txs/{tx}/withdrawals:
+    get:
+      summary: Get transaction withdrawals
+      description: Returns withdrawals from reward accounts in the transaction.
+      operationId: getTransactionWithdrawals
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of withdrawals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Withdrawal"
+
+  /txs/{tx}/mirs:
+    get:
+      summary: Get MIRs in transaction
+      description: Returns MIR (Move Instantaneous Rewards) certificates included in the transaction.
+      operationId: getTransactionMirs
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of MIR certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MIR"
+
+  /txs/{tx}/pool_updates:
+    get:
+      summary: Get pool updates in transaction
+      description: Returns pool registration or update certificates in the transaction.
+      operationId: getTransactionPoolUpdates
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of pool update certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PoolUpdateT"
+
+  /txs/{tx}/pool_retires:
+    get:
+      summary: Get pool retirements in transaction
+      description: Returns pool retirement certificates in the transaction.
+      operationId: getTransactionPoolRetires
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of pool retire certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PoolRetire"
+
+  /txs/{tx}/metadata:
+    get:
+      summary: Get transaction metadata
+      description: Returns metadata attached to the transaction.
+      operationId: getTransactionMetadata
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: Transaction metadata key-value pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TxMetadata"
+
+  /txs/{tx}/metadata/cbor:
+    get:
+      summary: Get transaction metadata in CBOR
+      description: Returns CBOR hex-encoded metadata attached to the transaction.
+      operationId: getTransactionMetadataCbor
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: CBOR encoded metadata
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "a10082825820..."
+
+  /txs/{tx}/redeemers:
+    get:
+      summary: Get redeemers for transaction
+      description: Returns redeemers included in the transaction.
+      operationId: getTransactionRedeemers
+      tags: [Transactions]
+
+      parameters:
+        - $ref: "#/components/parameters/TxHashParam"
+      responses:
+        "200":
+          description: List of redeemers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RedeemerT"
+  /utils/addresses/xpub/{address}/{role}/{index}:
+    get:
+      summary: Generate address from xpub
+      description: |
+        Derives a Cardano address using the extended public key (xpub), role, and index.
+
+        - `address`: Extended public key (xpub) in hex or base58 format.
+        - `role`: Role type - typically 0 for external addresses, 1 for internal/change addresses.
+        - `index`: Address index to derive.
+      operationId: generateAddressFromXpub
+      tags:
+        - Utils
+
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Extended public key (xpub)
+          example: "xpub6CUGRUonZSQ4TWtTMmzXdrXDtyPWKi8..."
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: integer
+            enum: [0, 1]
+          description: Role of address (0 = external, 1 = internal/change)
+          example: 0
+        - name: index
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Address index number
+          example: 0
+      responses:
+        "200":
+          description: Derived Cardano address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: Derived Cardano address
+                    example: "addr1q9..."
+        "400":
+          description: Invalid parameters supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized - missing or invalid project_id header
+        "404":
+          description: Extended public key not found or invalid
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Invalid xpub format"
+    Block:
+      type: object
+      description: Cardano blockchain block details
+      properties:
+        time:
+          type: integer
+          description: Unix timestamp of the block
+          example: 1596059091
+        height:
+          type: integer
+          description: Block height (block number)
+          example: 2900000
+        hash:
+          type: string
+          description: Block hash
+          example: "5a8f...9d4"
+        slot:
+          type: integer
+          description: Absolute slot number
+          example: 34782921
+        epoch:
+          type: integer
+          description: Epoch number
+          example: 210
+        epoch_slot:
+          type: integer
+          description: Slot within epoch
+          example: 12345
+        slot_leader:
+          type: string
+          description: Stake pool ID who produced the block
+          example: "pool1pu5jljp..."
+        size:
+          type: integer
+          description: Size of the block in bytes
+          example: 2150
+        tx_count:
+          type: integer
+          description: Number of transactions in the block
+          example: 12
+        output:
+          type: string
+          description: Total output ADA in Lovelace
+          example: "2150000000"
+        fees:
+          type: string
+          description: Total fees collected in Lovelace
+          example: "178000"
+        block_vrf:
+          type: string
+          description: VRF key for the block
+          example: "vrf_vk1..."
+        previous_block:
+          type: string
+          nullable: true
+          description: Previous block hash
+          example: "a7b3...c9d"
+        next_block:
+          type: string
+          nullable: true
+          description: Next block hash
+          example: "c8d4...e7f"
+
+    EpochParameters:
+      type: object
+      description: Protocol parameters for a Cardano epoch
+      properties:
+        epoch:
+          type: integer
+          example: 310
+        min_fee_a:
+          type: integer
+          description: Linear fee constant a
+          example: 44
+        min_fee_b:
+          type: integer
+          description: Linear fee constant b
+          example: 155381
+        max_block_size:
+          type: integer
+          description: Maximum block size in bytes
+          example: 65536
+        max_tx_size:
+          type: integer
+          description: Maximum transaction size in bytes
+          example: 16384
+        max_block_header_size:
+          type: integer
+          description: Maximum block header size in bytes
+          example: 1100
+        key_deposit:
+          type: string
+          description: Deposit required for stake key registration (Lovelace)
+          example: "2000000"
+        pool_deposit:
+          type: string
+          description: Deposit required for stake pool registration (Lovelace)
+          example: "500000000"
+        e_max:
+          type: integer
+          description: Maximum number of epochs a pool retirement is valid for
+          example: 18
+        n_opt:
+          type: integer
+          description: Desired number of pools
+          example: 150
+        pool_pledge_influence:
+          type: number
+          format: float
+          example: 0.3
+        expansion_rate:
+          type: number
+          format: float
+          example: 0.003
+        treasury_growth_rate:
+          type: number
+          format: float
+          example: 0.002
+        decentralisation_param:
+          type: number
+          format: float
+          example: 0.5
+        extra_entropy:
+          type: string
+          nullable: true
+          description: Extra entropy (if any)
+          example: null
+        protocol_major_ver:
+          type: integer
+          example: 5
+        protocol_minor_ver:
+          type: integer
+          example: 0
+        min_utxo:
+          type: string
+          description: Minimum UTXO value (Lovelace)
+          example: "1000000"
+        min_pool_cost:
+          type: string
+          description: Minimum pool cost (Lovelace)
+          example: "340000000"
+        nonce:
+          type: string
+          description: Nonce for the epoch
+          example: "1a2b3c4d5e6f"
+
+    EpochStake:
+      type: object
+      description: Stake distribution for a pool in an epoch
+      properties:
+        pool_id:
+          type: string
+          description: Stake pool ID
+          example: "pool1pu5jljp..."
+        active_stake:
+          type: string
+          description: Active stake in Lovelace
+          example: "123456789012"
+        delegators_count:
+          type: integer
+          description: Number of delegators
+          example: 1023
+
+    BlockN:
+      type: object
+      description: Cardano blockchain block details
+      properties:
+        time:
+          type: integer
+          description: Unix timestamp of the block
+          example: 1596059091
+        height:
+          type: integer
+          description: Block height (block number)
+          example: 2900000
+        hash:
+          type: string
+          description: Block hash
+          example: "5a8f6e9bfc4e9f07a831b36a5d3f1a2d9e2d91c79a6a3b9f7a5e4d9a2f8b9d4"
+        slot:
+          type: integer
+          description: Absolute slot number
+          example: 34782921
+        epoch:
+          type: integer
+          description: Epoch number
+          example: 210
+        epoch_slot:
+          type: integer
+          description: Slot within epoch
+          example: 12345
+        slot_leader:
+          type: string
+          description: Stake pool ID who produced the block
+          example: "pool1pu5jljp..."
+        size:
+          type: integer
+          description: Size of the block in bytes
+          example: 2150
+        tx_count:
+          type: integer
+          description: Number of transactions in the block
+          example: 12
+        output:
+          type: string
+          description: Total output ADA in Lovelace
+          example: "2150000000"
+        fees:
+          type: string
+          description: Total fees collected in Lovelace
+          example: "178000"
+        block_vrf:
+          type: string
+          description: VRF key for the block
+          example: "vrf_vk1..."
+        previous_block:
+          type: string
+          nullable: true
+          description: Previous block hash
+          example: "a7b3...c9d"
+        next_block:
+          type: string
+          nullable: true
+          description: Next block hash
+          example: "c8d4...e7f"
+
+    Genesis:
+      type: object
+      properties:
+        active_slots_coefficient:
+          type: number
+          format: float
+          example: 0.05
+          description: Active slots coefficient (fraction of slots in which blocks can be produced)
+        update_quorum:
+          type: integer
+          example: 5
+          description: Number of genesis keys required for protocol update approval
+        max_lovelace_supply:
+          type: string
+          example: "45000000000000000"
+          description: Maximum supply of Lovelace (ADA)
+        network_magic:
+          type: integer
+          example: 764824073
+          description: Network magic number used to distinguish networks
+        epoch_length:
+          type: integer
+          example: 432000
+          description: Number of slots in an epoch
+        system_start:
+          type: integer
+          format: int64
+          example: 1506203091
+          description: System start time in UNIX timestamp
+        slots_per_kes_period:
+          type: integer
+          example: 129600
+          description: Number of slots per KES (Key Evolving Signature) period
+        slot_length:
+          type: number
+          format: float
+          example: 1.0
+          description: Length of each slot in seconds
+        max_kes_evolutions:
+          type: integer
+          example: 62
+          description: Maximum number of KES key evolutions
+        security_param:
+          type: integer
+          example: 2160
+          description: Security parameter (number of slots needed for chain stability)
+        linear_fee:
+          type: object
+          description: Transaction fee calculation parameters
+          properties:
+            min_fee_a:
+              type: integer
+              example: 44
+            min_fee_b:
+              type: integer
+              example: 155381
+        decentralisation_param:
+          type: number
+          format: float
+          example: 0.5
+          description: Decentralization parameter (deprecated in latest eras)
+
+    MetadataLabel:
+      type: object
+      description: Metadata label used in transactions
+      properties:
+        label:
+          type: string
+          example: "1967"
+        cip10:
+          type: string
+          nullable: true
+          description: CIP10 standard label name (if available)
+          example: "nut.link"
+        count:
+          type: integer
+          description: Number of occurrences of this label
+          example: 23
+
+    MetadataContent:
+      type: object
+      description: Metadata content entry
+      properties:
+        tx_hash:
+          type: string
+          description: Transaction hash
+          example: "b1d9d...e12"
+        json_metadata:
+          type: object
+          description: Raw JSON metadata for this label
+          example:
+            name: "example"
+            value: 42
+
+    NetworkEra:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Cardano era
+          example: "shelley"
+        start_at:
+          type: object
+          nullable: true
+          description: When the era started (null for Byron)
+          properties:
+            slot:
+              type: integer
+              example: 4492800
+            epoch:
+              type: integer
+              example: 208
+        end_at:
+          type: object
+          nullable: true
+          description: When the era ended (null for latest/ongoing era)
+          properties:
+            slot:
+              type: integer
+              example: 4924800
+            epoch:
+              type: integer
+              example: 236
+
+    PoolRetirement:
+      type: object
+      properties:
+        pool_id:
+          type: string
+          example: pool1pu5jljp0...
+        retiring_epoch:
+          type: integer
+          example: 225
+
+    PoolMetadata:
+      type: object
+      properties:
+        pool_id:
+          type: string
+        url:
+          type: string
+          example: "https://example.com/poolMeta.json"
+        hash:
+          type: string
+          example: "47c0c68df3c..."
+        ticker:
+          type: string
+          example: "TICK"
+        name:
+          type: string
+          example: "My Stake Pool"
+        description:
+          type: string
+        homepage:
+          type: string
+          example: "https://example.com"
+
+    Relay:
+      type: object
+      properties:
+        ipv4:
+          type: string
+          nullable: true
+          example: "192.168.0.1"
+        ipv6:
+          type: string
+          nullable: true
+          example: "::1"
+        dns:
+          type: string
+          nullable: true
+          example: "relay.pool.com"
+        port:
+          type: integer
+          nullable: true
+          example: 3001
+
+    Delegator:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "stake1u9f..."
+        live_stake:
+          type: string
+          example: "11379593598"
+
+    PoolUpdate:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+          example: "abcdef123456..."
+        cert_index:
+          type: integer
+          example: 0
+        action:
+          type: string
+          example: "registered"
+
+    Script:
+      type: object
+      properties:
+        hash:
+          type: string
+          description: Script hash
+          example: "d91b31d1d0f0db8..."
+        type:
+          type: string
+          description: Script type (e.g., "plutus", "native")
+          example: "plutus"
+        serialised_size:
+          type: integer
+          description: Serialized size of the script in bytes
+          example: 512
+
+    Redeemer:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+          description: Transaction hash of redeemer
+          example: "3e8a16..."
+        purpose:
+          type: string
+          description: Redeemer purpose (e.g., "spend", "mint", "cert", "reward")
+          example: "spend"
+        index:
+          type: integer
+          description: Redeemer index in the transaction
+          example: 0
+        data:
+          type: string
+          description: Redeemer data (JSON or CBOR hex)
+          example: '{"constructor": 0, "fields": []}'
+        ex_units:
+          type: object
+          description: Execution units
+          properties:
+            memory:
+              type: integer
+              example: 123456
+            steps:
+              type: integer
+              example: 7890
+
+    Transaction:
+      type: object
+      properties:
+        hash:
+          type: string
+          example: "5c7f2f2b7f12f53ae9..."
+        block:
+          type: string
+          example: "7a6d6d..."
+        block_height:
+          type: integer
+          example: 4500000
+        slot:
+          type: integer
+          example: 12345678
+        index:
+          type: integer
+          example: 0
+        output_amount:
+          type: array
+          description: List of output amounts (lovelace and assets)
+          items:
+            type: object
+            properties:
+              unit:
+                type: string
+                example: "lovelace"
+              quantity:
+                type: string
+                example: "1000000"
+        fees:
+          type: string
+          example: "170000"
+        deposit:
+          type: string
+          example: "2000000"
+        size:
+          type: integer
+          example: 433
+        invalid_before:
+          type: integer
+          nullable: true
+          example: null
+        invalid_hereafter:
+          type: integer
+          nullable: true
+          example: 12345678
+        valid_contract:
+          type: boolean
+          nullable: true
+          example: true
+
+    StakeCertificate:
+      type: object
+      properties:
+        cert_index:
+          type: integer
+          example: 0
+        address:
+          type: string
+          example: "stake1u9f..."
+
+    Delegation:
+      type: object
+      properties:
+        cert_index:
+          type: integer
+          example: 1
+        address:
+          type: string
+          example: "stake1u9f..."
+        pool_id:
+          type: string
+          example: "pool1pu5jljp0u..."
+        active_epoch:
+          type: integer
+          example: 225
+
+    Withdrawal:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "stake1u9f..."
+        amount:
+          type: string
+          example: "1234567"
+
+    MIR:
+      type: object
+      properties:
+        cert_index:
+          type: integer
+          example: 0
+        pot:
+          type: string
+          description: Reward pot type ("reserve" or "treasury")
+          example: "reserve"
+        amount:
+          type: string
+          example: "1000000"
+
+    PoolUpdateT:
+      type: object
+      properties:
+        cert_index:
+          type: integer
+          example: 0
+        pool_id:
+          type: string
+          example: "pool1pu5jljp0u..."
+        vrf_key:
+          type: string
+          example: "vrf_vk1..."
+
+    PoolRetire:
+      type: object
+      properties:
+        cert_index:
+          type: integer
+          example: 0
+        pool_id:
+          type: string
+          example: "pool1pu5jljp0u..."
+        epoch:
+          type: integer
+          example: 225
+
+    TxMetadata:
+      type: object
+      properties:
+        json_metadata:
+          type: object
+          description: JSON metadata content
+          example:
+            key1: "value1"
+            key2: 42
+
+    RedeemerT:
+      type: object
+      properties:
+        tx_hash:
+          type: string
+          example: "5c7f2f2b7f12f53ae9..."
+        purpose:
+          type: string
+          description: Redeemer purpose (spend, mint, cert, reward)
+          example: "spend"
+        index:
+          type: integer
+          example: 0
+        data:
+          type: string
+          example: '{"constructor": 0, "fields": []}'
+        ex_units:
+          type: object
+          properties:
+            memory:
+              type: integer
+              example: 123456
+            steps:
+              type: integer
+              example: 7890
+  parameters:
+    StakeAddress:
+      name: address
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Bech32 stake address (e.g. `stake1u...`)
+
+    AddressParam:
+      name: address
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Bech32-encoded address
+
+    AssetParam:
+      name: asset
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Asset unit (policy_id + hex-encoded asset name)
+
+    PageParam:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: Pagination (default is 1)
+
+    CountParam:
+      name: count
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+        maximum: 100
+      description: Max number of results (default 100, max 100)
+
+    OrderParam:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: Sort order
+
+    PageParamN:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: Pagination (default is 1)
+
+    CountParamN:
+      name: count
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+        maximum: 100
+      description: Max number of results (default 100, max 100)
+
+    OrderParamN:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: Sort order
+
+    PageParamM:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: Pagination (default is 1)
+
+    CountParamM:
+      name: count
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 100
+        maximum: 100
+      description: Max number of results per page (default 100)
+
+    OrderParamM:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
+      description: Ordering of results (ascending or descending)
+
+    PageParamP:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+      required: false
+
+    CountParamP:
+      name: count
+      in: query
+      schema:
+        type: integer
+        default: 100
+        maximum: 100
+      required: false
+
+    OrderParamP:
+      name: order
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
+      required: false
+
+    PoolIdParam:
+      name: pool_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Bech32 or hex-encoded pool ID
+
+    PageParamS:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+      required: false
+      description: Page number for pagination (default 1)
+
+    CountParamS:
+      name: count
+      in: query
+      schema:
+        type: integer
+        default: 100
+        maximum: 100
+      required: false
+      description: Number of results per page (default 100)
+
+    OrderParamS:
+      name: order
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
+      required: false
+      description: Sort order (ascending or descending)
+
+    ScriptHashParam:
+      name: script
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Script hash identifier
+
+    TxHashParam:
+      name: tx
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Transaction hash (hex)

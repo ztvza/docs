@@ -86,9 +86,20 @@
             ]
           },
           {
-            "group": "API documentation",
+            "group": "ADA",
             "pages": [
-              "api-reference/introduction"
+              {
+                "group": "Blockfrost API",
+                "openapi": "/api-reference/endpoint/ADA/blockfrost.yaml"
+              },
+              {
+                "group": "Index API",
+                "openapi": "/api-reference/endpoint/ADA/index.yaml"
+              },
+              {
+                "group": "Rosetta API",
+                "openapi": "/api-reference/endpoint/ADA/rosetta.yaml"
+              }
             ]
           }
         ]
