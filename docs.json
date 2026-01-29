@@ -155,7 +155,7 @@
             "pages": [
               {
                 "group": "Cosmos API",
-                "openapi": "/api-reference/endpoint/AXL/axelar.yml"
+                "openapi": "/api-reference/endpoint/AXL/axelar.yaml"
               },
               {
                 "group": "Tendermint API",
