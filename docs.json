@@ -115,7 +115,7 @@
               },
               {
                 "group": "KMD API",
-                "openapi": "/api-reference/endpoint/ALGO/kmd.yml"
+                "openapi": "/api-reference/endpoint/ALGO/kmd.yaml"
               }
             ]
           }
