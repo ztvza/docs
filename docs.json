@@ -154,12 +154,15 @@
             "group": "ARB",
             "pages": [
               {
+                "group": "Eth accounts",
                 "openapi": "/api-reference/endpoint/ARB/eth_accounts.yaml"
               },
               {
+                "group": "Eth BlockNumber",
                 "openapi": "/api-reference/endpoint/ARB/eth_blockNumber.yaml"
               },
               {
+                "group": "Eth Call",
                 "openapi": "/api-reference/endpoint/ARB/eth_call.yaml"
               },
               {
