@@ -12,14 +12,22 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
+          "anchor": "Website",
           "icon": "book-open-cover",
-          "href": "https://mintlify.com/docs"
+          "color": {
+            "light": "#ffffff",
+            "dark": "#ffffff"
+          },
+          "href": "https://nownodes.io/"
         },
         {
-          "anchor": "Blog",
+          "anchor": "Dashboard",
           "icon": "newspaper",
-          "href": "https://mintlify.com/blog"
+          "color": {
+            "light": "#973EDF",
+            "dark": "#973EDF"
+          },
+          "href": "https://account.nownodes.io/profile/dashboard"
         }
       ]
     },
