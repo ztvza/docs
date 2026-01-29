@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_mining
+      summary: eth_mining
+      description: >
+        Checks whether the Ethereum client is actively mining.
+      operationId: eth_mining
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  enum: [eth_mining]
+                  example: "eth_mining"
+                params:
+                  type: array
+                  description: This method does not accept parameters.
+                  maxItems: 0
+                  example: []
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: JSON-RPC Response indicating mining status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jsonrpc, id, result]
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: boolean
+                    description: >
+                      `true` if the client is actively mining new blocks, otherwise `false`.
+                    example: false
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

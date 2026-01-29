@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_feeHistory
+      summary: eth_feeHistory
+      description: >
+        Returns fee market information for a range of blocks. This is typically used by wallets and other tools to estimate appropriate gas prices.
+      operationId: eth_feeHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_feeHistory"
+                params:
+                  type: array
+                  description: >
+                    Parameters:
+                      1. `blockCount` — number of blocks in the requested range.
+                      2. `newestBlock` — highest block number in the requested range (can be "latest").
+                      3. `rewardPercentiles` — list of percentile values to sample priority fees from each block (optional).
+                  items:
+                    anyOf:
+                      - type: string
+                      - type: integer
+                      - type: array
+                        items:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                  example: ["0x5", "latest", [10, 50, 90]]
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: JSON-RPC Response with fee history data
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jsonrpc, id, result]
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: object
+                    required:
+                      - oldestBlock
+                      - baseFeePerGas
+                      - gasUsedRatio
+                    properties:
+                      oldestBlock:
+                        type: string
+                        description: >
+                          The lowest block number of the returned range, encoded as a hexadecimal string.
+                        example: "0x10d4f"
+                      baseFeePerGas:
+                        type: array
+                        description: >
+                          An array of base fee per gas for each block in the range (plus one extra block).
+                        items:
+                          type: string
+                          example: "0x1dcd65000"
+                      gasUsedRatio:
+                        type: array
+                        description: >
+                          An array of floats from 0 to 1 representing the ratio of gas used to gas limit for each block.
+                        items:
+                          type: number
+                          format: float
+                          example: 0.85
+                      reward:
+                        type: array
+                        description: >
+                          An array of arrays of reward values (priority fees per gas), sampled at the requested percentiles.
+                          The outer array has one entry per block.
+                          The inner arrays contain values (as hex strings) for each percentile.
+                        items:
+                          type: array
+                          items:
+                            type: string
+                            example: "0x59682f00"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

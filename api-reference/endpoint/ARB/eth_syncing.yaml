@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_syncing
+      summary: Check if node is syncing
+      operationId: ethSyncing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_syncing"
+                params:
+                  type: array
+                  description: Must be an empty array.
+                  example: []
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_syncing"
+                  params: []
+                  id: 1
+      responses:
+        "200":
+          description: Returns sync status object or false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    oneOf:
+                      - type: boolean
+                        example: false
+                      - type: object
+                        properties:
+                          startingBlock:
+                            type: string
+                            description: Starting block (hex)
+                            example: "0x384"
+                          currentBlock:
+                            type: string
+                            description: Current block being synced (hex)
+                            example: "0x386"
+                          highestBlock:
+                            type: string
+                            description: Highest block available (hex)
+                            example: "0x454"
+              examples:
+                NotSyncing:
+                  summary: Node is not syncing
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: false
+                Syncing:
+                  summary: Node is syncing
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      startingBlock: "0x384"
+                      currentBlock: "0x386"
+                      highestBlock: "0x454"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

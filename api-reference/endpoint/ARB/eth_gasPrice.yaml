@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_gasPrice
+      summary: Get Suggested Gas Price
+      operationId: ethGasPrice
+      description: |
+        Returns the current gas price in wei as a hexadecimal string.
+        This value is a node estimate based on recent blocks and mempool activity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version
+                method:
+                  type: string
+                  example: "eth_gasPrice"
+                  description: JSON-RPC method name
+                params:
+                  type: array
+                  description: This method takes an empty array.
+                  example: []
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier
+      responses:
+        '200':
+          description: Suggested gas price in wei
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version
+                  id:
+                    type: integer
+                    example: 1
+                    description: Same as request ID
+                  result:
+                    type: string
+                    example: "0x09184e72a000"
+                    description: |
+                      Current gas price in wei, as hexadecimal.
+                      Example: "0x09184e72a000" = 10000000000000 wei (10 gwei)
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

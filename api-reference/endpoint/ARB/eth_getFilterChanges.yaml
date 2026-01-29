@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getFilterChanges
+      summary: Get Filter Changes
+      operationId: ethGetFilterChanges
+      description: |
+        Returns an array of logs that occurred since the last poll for the specified filter ID.
+        The filter must have been previously created with eth_newFilter or eth_newBlockFilter or eth_newPendingTransactionFilter.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version.
+                method:
+                  type: string
+                  example: "eth_getFilterChanges"
+                  description: JSON-RPC method name.
+                params:
+                  type: array
+                  description: |
+                    Parameters array with a single element:
+                    1. The filter ID (hex string).
+                  minItems: 1
+                  maxItems: 1
+                  items:
+                    type: string
+                  example:
+                    - "0x16"
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier.
+      responses:
+        '200':
+          description: Array of log objects or transaction hashes depending on filter type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version.
+                  id:
+                    type: integer
+                    example: 1
+                    description: Request ID.
+                  result:
+                    type: array
+                    description: |
+                      Array of logs or transaction hashes that occurred since last poll.
+                      For log filters, each element is a log object.
+                      For block or pending transaction filters, each element is a transaction hash string.
+                    items:
+                      oneOf:
+                        - type: object
+                          description: Log object
+                          properties:
+                            address:
+                              type: string
+                              description: Contract address emitting the log.
+                              example: "0x1234567890abcdef1234567890abcdef12345678"
+                            topics:
+                              type: array
+                              description: Array of topics provided by the contract.
+                              items:
+                                type: string
+                                example: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+                            data:
+                              type: string
+                              description: Data associated with the log.
+                              example: "0x000000000000000000000000000000000000000000000000000000000000003e8"
+                            blockNumber:
+                              type: string
+                              description: Block number where this log was included, in hex.
+                              example: "0x1b4"
+                            transactionHash:
+                              type: string
+                              description: Hash of the transaction this log was created from.
+                              example: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                            transactionIndex:
+                              type: string
+                              description: Transaction index within the block, in hex.
+                              example: "0x0"
+                            blockHash:
+                              type: string
+                              description: Hash of the block where this log was included.
+                              example: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+                            logIndex:
+                              type: string
+                              description: Index of the log within the block, in hex.
+                              example: "0x0"
+                            removed:
+                              type: boolean
+                              description: Indicates if the log was removed due to a chain reorganization.
+                              example: false
+                        - type: string
+                          description: Transaction hash (for block or pending transaction filters)
+                          example: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - web3_sha3
+      summary: web3_sha3
+      description: >
+        Computes the Keccak-256 (SHA-3) hash of the given hex-encoded data.
+      operationId: web3_sha3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  enum: [web3_sha3]
+                  example: "web3_sha3"
+                params:
+                  type: array
+                  description: >
+                    Array containing a single hex-encoded data string to hash.
+                  items:
+                    type: string
+                    pattern: '^0x([0-9a-fA-F])*'
+                    example: "0x68656c6c6f" # hex for "hello"
+                  minItems: 1
+                  maxItems: 1
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: JSON-RPC response with the Keccak-256 hash of the input data
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jsonrpc, id, result]
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    description: >
+                      The Keccak-256 (SHA-3) hash as a 0x-prefixed hex string.
+                    example: "0x5d41402abc4b2a76b9719d911017c592"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

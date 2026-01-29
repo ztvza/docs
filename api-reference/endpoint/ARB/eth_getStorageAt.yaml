@@ -1,0 +1,86 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getStorageAt
+      summary: Get Storage At
+      operationId: ethGetStorageAt
+      description: |
+        Returns the value stored at `position` in the storage of the contract at `address` at the given `blockNumber`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version.
+                method:
+                  type: string
+                  example: "eth_getStorageAt"
+                  description: JSON-RPC method name.
+                params:
+                  type: array
+                  description: |
+                    Parameters array:
+                    1) address: string - Contract address to query storage from.
+                    2) position: string - Storage slot position (hex string).
+                    3) block number: string - Block number or keywords ("latest", "earliest", "pending").
+                  maxItems: 3
+                  items:
+                    type: string
+                    description: Contract address in hex format (20 bytes).
+                  example: 
+                    - "0x1234567890abcdef1234567890abcdef12345678"
+                    - "0x0"
+                    - "latest"
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier.
+      responses:
+        '200':
+          description: Storage slot value at the specified position
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version.
+                  id:
+                    type: integer
+                    example: 1
+                    description: Request ID.
+                  result:
+                    type: string
+                    description: Value of the storage slot at the given position (32-byte hex string).
+                    example: "0x000000000000000000000000000000000000000000000000000000000000000a"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

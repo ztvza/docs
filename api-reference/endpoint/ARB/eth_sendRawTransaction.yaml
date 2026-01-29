@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_sendRawTransaction
+      summary: Send a raw signed transaction
+      operationId: ethSendRawTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  description: JSON-RPC version
+                  example: "2.0"
+                method:
+                  type: string
+                  description: Method name
+                  example: "eth_sendRawTransaction"
+                params:
+                  type: array
+                  description: Array containing a single signed transaction data (hex string)
+                  items:
+                    type: string
+                    description: Raw signed transaction data, hex-encoded, prefixed with "0x"
+                    example: "0xf86b808504a817c800825208940000000000000000000000000000000000000000880de0b6b3a76400008026a0980..."
+                id:
+                  type: integer
+                  description: Request ID
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_sendRawTransaction"
+                  params:
+                    - "0xf86b808504a817c800825208940000000000000000000000000000000000000000880de0b6b3a76400008026a0c6a6..."
+                  id: 1
+      responses:
+        "200":
+          description: Transaction successfully sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    description: Transaction hash (txid) of the submitted transaction
+                    example: "0x7f8a08576b8474e17e8311c2732029232892d450bfdc30816ffb133c2f8e3f1a"
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: "0x7f8a08576b8474e17e8311c2732029232892d450bfdc30816ffb133c2f8e3f1a"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

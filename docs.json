@@ -73,19 +73,6 @@
         "tab": "API Docs",
         "groups": [
           {
-            "group": "AKR",
-            "pages": [
-              {
-                "group": "Cosmos API",
-                "openapi": "/api-reference/endpoint/cosmos.yml"
-              },
-              {
-                "group": "Tendermint API",
-                "openapi": "/api-reference/endpoint/tendermint.yaml"
-              }
-            ]
-          },
-          {
             "group": "ADA",
             "pages": [
               {
@@ -99,6 +86,32 @@
               {
                 "group": "Rosetta API",
                 "openapi": "/api-reference/endpoint/ADA/rosetta.yaml"
+              }
+            ]
+          },
+          {
+            "group": "AKT",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/AKT/cosmos.yml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/AKT/tendermint.yaml"
+              }
+            ]
+          },
+          {
+            "group": "AKR",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/cosmos.yml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/tendermint.yaml"
               }
             ]
           },
@@ -134,6 +147,191 @@
               {
                 "group": "APLH API",
                 "openapi": "/api-reference/endpoint/APT/node.yaml"
+              }
+            ]
+          },
+          {
+            "group": "ARB",
+            "pages": [
+              {
+                "group": "Eth accounts",
+                "openapi": "/api-reference/endpoint/ARB/eth_accounts.yaml"
+              },
+              {
+                "group": "Eth BlockNumber",
+                "openapi": "/api-reference/endpoint/ARB/eth_blockNumber.yaml"
+              },
+              {
+                "group": "Eth Call",
+                "openapi": "/api-reference/endpoint/ARB/eth_call.yaml"
+              },
+              {
+                "group": "Eth ChainId",
+                "openapi": "/api-reference/endpoint/ARB/eth_chainId.yaml"
+              },
+              {
+                "group": "Eth Coinbase",
+                "openapi": "/api-reference/endpoint/ARB/eth_coinbase.yaml"
+              },
+              {
+                "group": "Eth EstimateGas",
+                "openapi": "/api-reference/endpoint/ARB/eth_estimateGas.yaml"
+              },
+              {
+                "group": "Eth feeHistory",
+                "openapi": "/api-reference/endpoint/ARB/eth_feeHistory.yaml"
+              },
+              {
+                "group": "Eth gasPrice",
+                "openapi": "/api-reference/endpoint/ARB/eth_gasPrice.yaml"
+              },
+              {
+                "group": "Eth getBalance",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBalance.yaml"
+              },
+              {
+                "group": "Eth getBlockByHash",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBlockByHash.yaml"
+              },
+              {
+                "group": "Eth getBlockByNumber",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBlockByNumber.yaml"
+              },
+              {
+                "group": "Eth getBlockReceipts",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBlockReceipts.yaml"
+              },
+              {
+                "group": "Eth getBlockTransactionCountByHash",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBlockTransactionCountByHash.yaml"
+              },
+              {
+                "group": "Eth getBlockTransactionCountByNumber",
+                "openapi": "/api-reference/endpoint/ARB/eth_getBlockTransactionCountByNumber.yaml"
+              },
+              {
+                "group": "Eth getCode",
+                "openapi": "/api-reference/endpoint/ARB/eth_getCode.yaml"
+              },
+              {
+                "group": "Eth getFilterChanges",
+                "openapi": "/api-reference/endpoint/ARB/eth_getFilterChanges.yaml"
+              },
+              {
+                "group": "Eth getFilterLogs",
+                "openapi": "/api-reference/endpoint/ARB/eth_getFilterLogs.yaml"
+              },
+              {
+                "group": "Eth getLogs",
+                "openapi": "/api-reference/endpoint/ARB/eth_getLogs.yaml"
+              },
+              {
+                "group": "Eth getStorageAt",
+                "openapi": "/api-reference/endpoint/ARB/eth_getStorageAt.yaml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/ARB/eth_getTransactionByBlockHashAndIndex.yaml"
+              },
+              {
+                "group": "Eth getTransactionByBlockNumberAndIndex",
+                "openapi": "/api-reference/endpoint/ARB/eth_getTransactionByBlockNumberAndIndex.yaml"
+              },
+              {
+                "group": "eth_getTransactionByHash",
+                "openapi": "/api-reference/endpoint/ARB/eth_getTransactionByHash.yaml"
+              },
+              {
+                "group": "eth_getTransactionCount",
+                "openapi": "/api-reference/endpoint/ARB/eth_getTransactionCount.yaml"
+              },
+              {
+                "group": "eth_getTransactionReceipt",
+                "openapi": "/api-reference/endpoint/ARB/eth_getTransactionReceipt.yaml"
+              },
+              {
+                "group": "eth_getUncleByBlockHashAndIndex",
+                "openapi": "/api-reference/endpoint/ARB/eth_getUncleByBlockHashAndIndex.yaml"
+              },
+              {
+                "group": "eth_getUncleByBlockNumberAndIndex",
+                "openapi": "/api-reference/endpoint/ARB/eth_getUncleByBlockNumberAndIndex.yaml"
+              },
+              {
+                "group": "eth_getUncleCountByBlockHash",
+                "openapi": "/api-reference/endpoint/ARB/eth_getUncleCountByBlockHash.yaml"
+              },
+              {
+                "group": "eth_getUncleCountByBlockNumber",
+                "openapi": "/api-reference/endpoint/ARB/eth_getUncleCountByBlockNumber.yaml"
+              },
+              {
+                "group": "eth_hashrate",
+                "openapi": "/api-reference/endpoint/ARB/eth_hashrate.yaml"
+              },
+              {
+                "group": "eth_maxPriorityFeePerGas",
+                "openapi": "/api-reference/endpoint/ARB/eth_maxPriorityFeePerGas.yaml"
+              },
+              {
+                "group": "eth_mining",
+                "openapi": "/api-reference/endpoint/ARB/eth_mining.yaml"
+              },
+              {
+                "group": "eth_newBlockFilter",
+                "openapi": "/api-reference/endpoint/ARB/eth_newBlockFilter.yaml"
+              },
+              {
+                "group": "eth_newFilter",
+                "openapi": "/api-reference/endpoint/ARB/eth_newFilter.yaml"
+              },
+              {
+                "group": "eth_newPendingTransactionFilter",
+                "openapi": "/api-reference/endpoint/ARB/eth_newPendingTransactionFilter.yaml"
+              },
+              {
+                "group": "eth_sendRawTransaction",
+                "openapi": "/api-reference/endpoint/ARB/eth_sendRawTransaction.yaml"
+              },
+              {
+                "group": "eth_sendTransaction",
+                "openapi": "/api-reference/endpoint/ARB/eth_sendTransaction.yaml"
+              },
+              {
+                "group": "eth_sign",
+                "openapi": "/api-reference/endpoint/ARB/eth_sign.yaml"
+              },
+              {
+                "group": "eth_signTransaction",
+                "openapi": "/api-reference/endpoint/ARB/eth_signTransaction.yaml"
+              },
+              {
+                "group": "eth_syncing",
+                "openapi": "/api-reference/endpoint/ARB/eth_syncing.yaml"
+              },
+              {
+                "group": "eth_uninstallFilter",
+                "openapi": "/api-reference/endpoint/ARB/eth_uninstallFilter.yaml"
+              },
+              {
+                "group": "net_listening",
+                "openapi": "/api-reference/endpoint/ARB/net_listening.yaml"
+              },
+              {
+                "group": "net_peerCount",
+                "openapi": "/api-reference/endpoint/ARB/net_peerCount.yaml"
+              },
+              {
+                "group": "net_version",
+                "openapi": "/api-reference/endpoint/ARB/net_version.yaml"
+              },
+              {
+                "group": "web3_clientVersion",
+                "openapi": "/api-reference/endpoint/ARB/web3_clientVersion.yaml"
+              },
+              {
+                "group": "web3_sha3",
+                "openapi": "/api-reference/endpoint/ARB/web3_sha3.yaml"
               }
             ]
           },

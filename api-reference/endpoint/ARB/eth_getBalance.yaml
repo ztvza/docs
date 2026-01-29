@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getBalance
+      summary: Get ETH Balance of an Address
+      operationId: ethGetBalance
+      description: |
+        Retrieves the balance (in wei) of a given Ethereum address.
+        You can specify the block parameter to get the balance at a specific block.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version
+                method:
+                  type: string
+                  example: "eth_getBalance"
+                  description: JSON-RPC method name
+                params:
+                  type: array
+                  minItems: 2
+                  maxItems: 2
+                  description: |
+                    Array with 2 parameters:
+                      1. Address (20-byte hex string with '0x' prefix)
+                      2. Block tag (e.g., 'latest', 'earliest', 'pending', or block number in hex)
+                  items:
+                    oneOf:
+                      - type: string
+                        example: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                        description: Ethereum address
+                      - type: string
+                        example: "latest"
+                        description: Block tag
+                id:
+                  type: integer
+                  example: 1
+                  description: Request ID
+      responses:
+        '200':
+          description: Balance (in wei) as hex string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version
+                  id:
+                    type: integer
+                    example: 1
+                    description: Same ID as in request
+                  result:
+                    type: string
+                    example: "0x0234c8a3397aab58"
+                    description: |
+                      Balance in wei as hexadecimal string.
+                      Example: "0x0234c8a3397aab58" = 158972490234375000 in decimal.
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

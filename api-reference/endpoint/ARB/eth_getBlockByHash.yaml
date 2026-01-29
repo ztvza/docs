@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getBlockByHash
+      summary: Get Block by Hash
+      operationId: ethGetBlockByHash
+      description: |
+        Returns the block information for the specified block hash.
+        The second parameter indicates whether to return full transaction objects or just transaction hashes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version
+                method:
+                  type: string
+                  example: "eth_getBlockByHash"
+                  description: JSON-RPC method name
+                params:
+                  type: array
+                  minItems: 2
+                  maxItems: 2
+                  description: |
+                    Array with 2 parameters:
+                      1. Block hash (32-byte hex string with '0x' prefix)
+                      2. Boolean to specify if full transaction objects are returned (`true`) or only transaction hashes (`false`)
+                  items:
+                    oneOf:
+                      - type: string
+                        example: "0x9b559a3d7ee67a0a8bb96ec93c93a0db3f9c66a355a3eb9f3f519c0f26a27c79"
+                        description: Block hash (hex string)
+                      - type: boolean
+                        example: true
+                        description: Return full transaction objects if true; else return only transaction hashes
+                id:
+                  type: integer
+                  example: 1
+                  description: Request ID
+      responses:
+        '200':
+          description: Block information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version
+                  id:
+                    type: integer
+                    example: 1
+                    description: Same ID as in request
+                  result:
+                    type: object
+                    description: Block object or null if not found
+                    properties:
+                      number:
+                        type: string
+                        description: Block number in hex
+                        example: "0x1b4"
+                      hash:
+                        type: string
+                        description: Block hash
+                        example: "0x9b559a3d7ee67a0a8bb96ec93c93a0db3f9c66a355a3eb9f3f519c0f26a27c79"
+                      parentHash:
+                        type: string
+                        description: Hash of the parent block
+                        example: "0x5e8d5f58b0c1be8c3a3d172a41f9f4e35f2f15d5b3347f17a6c11a3aeadf9c10"
+                      nonce:
+                        type: string
+                        description: Block nonce
+                        example: "0x0000000000000000"
+                      sha3Uncles:
+                        type: string
+                        description: SHA3 of the uncles data in the block
+                        example: "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+                      logsBloom:
+                        type: string
+                        description: Bloom filter for logs
+                        example: "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      transactionsRoot:
+                        type: string
+                        description: Root of the transaction trie of the block
+                        example: "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+                      stateRoot:
+                        type: string
+                        description: Root of the final state trie of the block
+                        example: "0xd7f8974fb5ac78d9e7a6ccfbcc2fdb5d98a9fdb716e0df485b4d39a5a6f85ebd"
+                      receiptsRoot:
+                        type: string
+                        description: Root of the receipts trie of the block
+                        example: "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+                      miner:
+                        type: string
+                        description: Address of the miner who mined the block
+                        example: "0x829BD824B016326A401d083B33D092293333A830"
+                      difficulty:
+                        type: string
+                        description: Difficulty for this block in hex
+                        example: "0x027f07"
+                      totalDifficulty:
+                        type: string
+                        description: Total difficulty of the chain until this block
+                        example: "0x027f07"
+                      extraData:
+                        type: string
+                        description: Extra data included in the block
+                        example: "0x"
+                      size:
+                        type: string
+                        description: Size of the block in bytes
+                        example: "0x027f07"
+                      gasLimit:
+                        type: string
+                        description: Maximum gas allowed in this block
+                        example: "0x9f759"
+                      gasUsed:
+                        type: string
+                        description: Total gas used by all transactions in the block
+                        example: "0x9f759"
+                      timestamp:
+                        type: string
+                        description: Unix timestamp for when the block was mined
+                        example: "0x54e34e8e"
+                      transactions:
+                        type: array
+                        description: List of transactions or transaction hashes (depending on request)
+                        items:
+                          oneOf:
+                            - type: string
+                              description: Transaction hash (if `false` was specified in request)
+                              example: "0x9f1c04b814a153e1b9f11b60d4e0f9349d07f9251e9b7b60aebb21721c8c07d7"
+                            - type: object
+                              description: Full transaction object (if `true` was specified in request)
+                              properties:
+                                hash:
+                                  type: string
+                                  description: Transaction hash
+                                  example: "0x9f1c04b814a153e1b9f11b60d4e0f9349d07f9251e9b7b60aebb21721c8c07d7"
+                                nonce:
+                                  type: string
+                                  description: Transaction nonce
+                                  example: "0x15"
+                                blockHash:
+                                  type: string
+                                  description: Hash of the block containing this transaction
+                                  example: "0x9b559a3d7ee67a0a8bb96ec93c93a0db3f9c66a355a3eb9f3f519c0f26a27c79"
+                                blockNumber:
+                                  type: string
+                                  description: Block number containing this transaction
+                                  example: "0x1b4"
+                                transactionIndex:
+                                  type: string
+                                  description: Index of the transaction in the block
+                                  example: "0x1"
+                                from:
+                                  type: string
+                                  description: Address of the sender
+                                  example: "0x829BD824B016326A401d083B33D092293333A830"
+                                to:
+                                  type: string
+                                  description: Address of the receiver (null if contract creation)
+                                  nullable: true
+                                  example: "0x3535353535353535353535353535353535353535"
+                                value:
+                                  type: string
+                                  description: Amount of wei transferred
+                                  example: "0x2386f26fc10000"
+                                gasPrice:
+                                  type: string
+                                  description: Gas price provided by the sender
+                                  example: "0x09184e72a000"
+                                gas:
+                                  type: string
+                                  description: Gas provided by the sender
+                                  example: "0x2710"
+                                input:
+                                  type: string
+                                  description: Input data for the transaction
+                                  example: "0x68656c6c6f21"
+                      uncles:
+                        type: array
+                        description: List of uncle hashes included in this block
+                        items:
+                          type: string
+                          example: "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

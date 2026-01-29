@@ -1,0 +1,89 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_sign
+      summary: Sign arbitrary data using eth_sign
+      operationId: ethSign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_sign"
+                params:
+                  type: array
+                  description: |
+                    [address, data]
+                    - address: The account that will sign the data
+                    - data: The data to be signed (must be a hex string)
+                  minItems: 2
+                  maxItems: 2
+                  items:
+                    type: string
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_sign"
+                  params:
+                    - "0x6A0bF1017C6e6Dd9D2BA447E2AAd951F13F7F7C3"
+                    - "0x68656c6c6f20776f726c64"
+                  id: 1
+      responses:
+        "200":
+          description: Returns the signature of the message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    description: Signature of the input data
+                    example: "0x2c6401ff89...3b4998b061"
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: "0x2c6401ff899fb4b2f7e118b9ff05ebc1428fc2e3a08779b589f1de94c8e56064d056f3d23b32bcb0e11aaee71a51bd8b3a7b361a3b4998b061"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

@@ -1,0 +1,83 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_maxPriorityFeePerGas
+      summary: Get recommended maxPriorityFeePerGas value
+      operationId: ethMaxPriorityFeePerGas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_maxPriorityFeePerGas"
+                params:
+                  type: array
+                  description: No parameters are required.
+                  example: []
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                summary: Basic request
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_maxPriorityFeePerGas"
+                  params: []
+                  id: 1
+      responses:
+        "200":
+          description: Returns the suggested maxPriorityFeePerGas value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    format: hex
+                    description: Suggested maxPriorityFeePerGas value in wei (hex encoded)
+              examples:
+                ExampleResponse:
+                  summary: Example result
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: "0x3b9aca00" # 1,000,000,000 wei = 1 Gwei
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

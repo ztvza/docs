@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getUncleByBlockNumberAndIndex
+      summary: Get uncle block by block number and index
+      operationId: ethGetUncleByBlockNumberAndIndex
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_getUncleByBlockNumberAndIndex"
+                params:
+                  type: array
+                  minItems: 2
+                  maxItems: 2
+                  items:
+                    type: string
+                  description: |
+                    - `blockNumber`: The block number as hex string (e.g., "0x10fb78"), or "latest", "earliest", "pending".
+                    - `index`: The uncle index as hex (e.g., "0x0" for the first uncle).
+                  example:
+                    - "0x5daf3b"
+                    - "0x0"
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_getUncleByBlockNumberAndIndex"
+                  params:
+                    - "0x5daf3b"
+                    - "0x0"
+                  id: 1
+      responses:
+        "200":
+          description: Uncle block object or null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: object
+                    nullable: true
+                    description: Uncle block object or null if not found
+                    properties:
+                      number:
+                        type: string
+                        description: Block number as hex.
+                      hash:
+                        type: string
+                        description: Hash of the uncle block.
+                      parentHash:
+                        type: string
+                        description: Hash of the parent block.
+                      miner:
+                        type: string
+                        description: Address of the miner who mined the block.
+                      difficulty:
+                        type: string
+                        description: Difficulty for this block.
+                      totalDifficulty:
+                        type: string
+                        description: Total difficulty of the chain until this block.
+                      extraData:
+                        type: string
+                        description: Extra data included in the block.
+                      size:
+                        type: string
+                        description: Block size in bytes.
+                      gasLimit:
+                        type: string
+                        description: Maximum gas allowed in the block.
+                      gasUsed:
+                        type: string
+                        description: Total gas used by transactions in the block.
+                      timestamp:
+                        type: string
+                        description: Timestamp of the block in Unix time.
+                      transactions:
+                        type: array
+                        description: Uncle blocks don’t include transactions.
+                        items:
+                          type: string
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      number: "0x5daf3c"
+                      hash: "0xabc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1"
+                      parentHash: "0xdef456def456def456def456def456def456def456def456def456def456def4"
+                      miner: "0x1234567890abcdef1234567890abcdef12345678"
+                      difficulty: "0x3e8"
+                      totalDifficulty: "0x1d4c"
+                      extraData: "0x"
+                      size: "0x220"
+                      gasLimit: "0x7a1200"
+                      gasUsed: "0x5208"
+                      timestamp: "0x5bad55"
+                      transactions: []
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

@@ -1,0 +1,92 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_uninstallFilter
+      summary: Uninstall an existing filter
+      operationId: ethUninstallFilter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_uninstallFilter"
+                params:
+                  type: array
+                  minItems: 1
+                  maxItems: 1
+                  items:
+                    type: string
+                    description: The ID of the filter to uninstall (as returned by eth_newFilter).
+                  example: ["0x16"]
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              UninstallFilterRequest:
+                summary: Example request
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_uninstallFilter"
+                  params: ["0x16"]
+                  id: 1
+      responses:
+        "200":
+          description: Success or failure of the uninstall operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: boolean
+                    description: Returns `true` if the filter was successfully uninstalled, otherwise `false`.
+              examples:
+                SuccessResponse:
+                  summary: Filter successfully uninstalled
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: true
+                FailedResponse:
+                  summary: Filter uninstall failed
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: false
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getTransactionByHash
+      summary: Get transaction by hash
+      operationId: ethGetTransactionByHash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_getTransactionByHash"
+                params:
+                  type: array
+                  description: Array containing a single transaction hash
+                  items:
+                    type: string
+                    format: hex
+                  minItems: 1
+                  maxItems: 1
+                  example:
+                    - "0x3f1c7f9e684bbd292f3b849df4c03ff4ffbd83ad2c6cb136a20ee2ebded7df72"
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_getTransactionByHash"
+                  params:
+                    - "0x3f1c7f9e684bbd292f3b849df4c03ff4ffbd83ad2c6cb136a20ee2ebded7df72"
+                  id: 1
+      responses:
+        "200":
+          description: Transaction object or null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    oneOf:
+                      - type: object
+                        description: Transaction object
+                        properties:
+                          hash:
+                            type: string
+                            description: Transaction hash
+                          nonce:
+                            type: string
+                            description: Number of transactions made by the sender prior to this one
+                          blockHash:
+                            type: string
+                            nullable: true
+                            description: Hash of the block containing this transaction (null if not mined)
+                          blockNumber:
+                            type: string
+                            nullable: true
+                            description: Block number where this transaction was in (null if not mined)
+                          transactionIndex:
+                            type: string
+                            nullable: true
+                            description: Index within the block (null if not mined)
+                          from:
+                            type: string
+                            description: Sender address
+                          to:
+                            type: string
+                            nullable: true
+                            description: Receiver address (null when contract creation)
+                          value:
+                            type: string
+                            description: Amount of wei transferred
+                          gas:
+                            type: string
+                            description: Gas provided by the sender
+                          gasPrice:
+                            type: string
+                            description: Gas price provided by the sender in wei
+                          input:
+                            type: string
+                            description: Data sent with the transaction
+                          type:
+                            type: string
+                            description: Transaction type (e.g., 0x0 = legacy)
+                      - type: string
+                        description: Returned if transaction not found
+                        example: null
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      hash: "0x3f1c7f9e684bbd292f3b849df4c03ff4ffbd83ad2c6cb136a20ee2ebded7df72"
+                      nonce: "0x15"
+                      blockHash: "0xb3b20624a42dffdf1af8e8a6c9b338360585cc309831785f2138e1f9c35a1f09"
+                      blockNumber: "0x5daf3b"
+                      transactionIndex: "0x0"
+                      from: "0x407d73d8a49eeb85d32cf465507dd71d507100c1"
+                      to: "0x85h1c2d44cf8531a24b1030f78134677856f7b9f"
+                      value: "0x7f110"
+                      gas: "0x5208"
+                      gasPrice: "0x4a817c800"
+                      input: "0x"
+                      type: "0x0"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

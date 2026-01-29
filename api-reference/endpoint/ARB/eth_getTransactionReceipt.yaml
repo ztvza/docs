@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getTransactionReceipt
+      summary: Get transaction receipt by hash
+      operationId: ethGetTransactionReceipt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_getTransactionReceipt"
+                params:
+                  type: array
+                  minItems: 1
+                  maxItems: 1
+                  items:
+                    type: string
+                    description: Transaction hash
+                    example: "0x5d1c7b4c8f3474891e1f632f85e7205b6d1a0e0ccbb5cfb1d3a2cf0e9d6f1df7"
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_getTransactionReceipt"
+                  params:
+                    - "0x5d1c7b4c8f3474891e1f632f85e7205b6d1a0e0ccbb5cfb1d3a2cf0e9d6f1df7"
+                  id: 1
+      responses:
+        "200":
+          description: Transaction receipt if mined, otherwise null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: object
+                    nullable: true
+                    properties:
+                      transactionHash:
+                        type: string
+                        description: Hash of the transaction.
+                      transactionIndex:
+                        type: string
+                        description: Integer of the transaction index position in the block.
+                      blockHash:
+                        type: string
+                        description: Hash of the block where this transaction was in.
+                      blockNumber:
+                        type: string
+                        description: Block number where this transaction was in.
+                      from:
+                        type: string
+                        description: Address of the sender.
+                      to:
+                        type: string
+                        nullable: true
+                        description: Address of the receiver. null when it's a contract creation transaction.
+                      cumulativeGasUsed:
+                        type: string
+                        description: Total amount of gas used when this transaction was executed in the block.
+                      gasUsed:
+                        type: string
+                        description: Amount of gas used by this specific transaction alone.
+                      contractAddress:
+                        type: string
+                        nullable: true
+                        description: The contract address created, if the transaction was a contract creation, otherwise null.
+                      logs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            topics:
+                              type: array
+                              items:
+                                type: string
+                            data:
+                              type: string
+                            blockNumber:
+                              type: string
+                            transactionHash:
+                              type: string
+                            transactionIndex:
+                              type: string
+                            blockHash:
+                              type: string
+                            logIndex:
+                              type: string
+                            removed:
+                              type: boolean
+                      logsBloom:
+                        type: string
+                        description: Bloom filter for light clients to quickly retrieve related logs.
+                      status:
+                        type: string
+                        description: 1 for success, 0 for failure.
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      transactionHash: "0x5d1c7b4c8f3474891e1f632f85e7205b6d1a0e0ccbb5cfb1d3a2cf0e9d6f1df7"
+                      transactionIndex: "0x0"
+                      blockHash: "0x9b559a..."
+                      blockNumber: "0x5daf3b"
+                      from: "0x742d35cc6634c0532925a3b844bc454e4438f44e"
+                      to: "0x53d284357ec70ce289d6d64134dfac8e511c8a3d"
+                      cumulativeGasUsed: "0x5208"
+                      gasUsed: "0x5208"
+                      contractAddress: null
+                      logs: []
+                      logsBloom: "0x000..."
+                      status: "0x1"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

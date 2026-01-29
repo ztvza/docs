@@ -1,0 +1,145 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getLogs
+      summary: Get Logs
+      operationId: ethGetLogs
+      description: |
+        Returns an array of logs that match the filter criteria specified in the params.
+        The filter object supports filtering by block range, addresses, and topics.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version.
+                method:
+                  type: string
+                  example: "eth_getLogs"
+                  description: JSON-RPC method name.
+                params:
+                  type: array
+                  description: |
+                    Parameters array with one element: the filter object.
+                  minItems: 1
+                  maxItems: 1
+                  items:
+                    type: object
+                    description: Filter object for logs query
+                    properties:
+                      fromBlock:
+                        type: string
+                        description: Starting block number (hex string) or "earliest", "latest", "pending".
+                        example: "0x1b4"
+                      toBlock:
+                        type: string
+                        description: Ending block number (hex string) or "earliest", "latest", "pending".
+                        example: "0x1f4"
+                      address:
+                        oneOf:
+                          - type: string
+                          - type: array
+                            items:
+                              type: string
+                        description: Contract address or list of addresses from which logs should originate.
+                        example: "0x1234567890abcdef1234567890abcdef12345678"
+                      topics:
+                        type: array
+                        description: Array of topic filters. Each topic can be a string, null, or an array of strings for OR filtering.
+                        example:
+                          - "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+                          - null
+                          - ["0x000000000000000000000000a7d9ddbe1f17865597fbd27ec712455208b6b76d","0x000000000000000000000000bb9bc244d798123fde783fcc1c72d3bb8c189413"]
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier.
+      responses:
+        '200':
+          description: Array of log objects matching the filter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version.
+                  id:
+                    type: integer
+                    example: 1
+                    description: Request ID.
+                  result:
+                    type: array
+                    description: Array of log objects matching the filter.
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                          description: Contract address emitting the log.
+                          example: "0x1234567890abcdef1234567890abcdef12345678"
+                        topics:
+                          type: array
+                          description: Array of topics provided by the contract.
+                          items:
+                            type: string
+                            example: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+                        data:
+                          type: string
+                          description: Data associated with the log.
+                          example: "0x000000000000000000000000000000000000000000000000000000000000003e8"
+                        blockNumber:
+                          type: string
+                          description: Block number where this log was included, in hex.
+                          example: "0x1b4"
+                        transactionHash:
+                          type: string
+                          description: Hash of the transaction this log was created from.
+                          example: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                        transactionIndex:
+                          type: string
+                          description: Transaction index within the block, in hex.
+                          example: "0x0"
+                        blockHash:
+                          type: string
+                          description: Hash of the block where this log was included.
+                          example: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+                        logIndex:
+                          type: string
+                          description: Index of the log within the block, in hex.
+                          example: "0x0"
+                        removed:
+                          type: boolean
+                          description: Indicates if the log was removed due to a chain reorganization.
+                          example: false
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

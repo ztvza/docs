@@ -1,0 +1,111 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_estimateGas
+      summary: Estimate Gas for Transaction
+      description: |
+        Simulates a transaction and returns an estimate of how much gas would be used.
+      operationId: ethEstimateGas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC protocol version
+                method:
+                  type: string
+                  example: "eth_estimateGas"
+                  description: The method name
+                params:
+                  type: array
+                  minItems: 1
+                  maxItems: 2
+                  description: |
+                    The transaction call object and an optional block tag.
+                  items:
+                    oneOf:
+                      - type: object
+                        required: [to]
+                        properties:
+                          from:
+                            type: string
+                            example: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                            description: Address the transaction is sent from (optional)
+                          to:
+                            type: string
+                            example: "0x6b175474e89094c44da98b954eedeac495271d0f"
+                            description: Destination address of the call
+                          gas:
+                            type: string
+                            example: "0x76c0"
+                            description: Gas limit provided for execution (optional)
+                          gasPrice:
+                            type: string
+                            example: "0x9184e72a000"
+                            description: Gas price in wei (optional)
+                          value:
+                            type: string
+                            example: "0x0"
+                            description: Amount of ETH to send, in hexadecimal wei (optional)
+                          data:
+                            type: string
+                            example: "0x70a08231000000000000000000000000a0df350d2637096571f7a701cbc1c5fd"
+                            description: The compiled input data for the transaction (optional)
+                      - type: string
+                        example: "latest"
+                        description: Optional block tag (e.g., "latest", "earliest", or a block number)
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier
+      responses:
+        '200':
+          description: Estimated gas amount
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version
+                  id:
+                    type: integer
+                    example: 1
+                    description: ID that matches the request
+                  result:
+                    type: string
+                    example: "0x5208"
+                    description: |
+                      Estimated gas needed for the transaction, returned as a hexadecimal string.
+                      Example: "0x5208" equals 21000 in decimal.
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

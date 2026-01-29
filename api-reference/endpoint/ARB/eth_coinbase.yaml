@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_coinbase
+      summary: eth_coinbase
+      description: >
+        Returns the Ethereum coinbase address (i.e., the address that receives mining rewards).
+      operationId: eth_coinbase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  enum: [eth_coinbase]
+                  example: "eth_coinbase"
+                params:
+                  type: array
+                  description: This method takes no parameters.
+                  maxItems: 0
+                  example: []
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: JSON-RPC Response with the coinbase address
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [jsonrpc, id, result]
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    description: >
+                      The coinbase address as a hexadecimal string (20 bytes, 0x-prefixed).
+                    example: "0x0000000000000000000000000000000000000000"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

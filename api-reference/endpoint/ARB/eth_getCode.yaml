@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getCode
+      summary: Get Contract Bytecode at Address
+      operationId: ethGetCode
+      description: |
+        Returns the contract code stored at a given address.
+        If the address is an externally owned account (EOA), it returns "0x".
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version.
+                method:
+                  type: string
+                  example: "eth_getCode"
+                  description: JSON-RPC method name.
+                params:
+                  type: array
+                  description: |
+                    Parameters array with two elements:
+                    1. The address to get the code for (hex string, 0x-prefixed).
+                    2. The block number or block tag (e.g., "latest", "earliest", "pending").
+                  minItems: 2
+                  maxItems: 2
+                  items:
+                    type: string
+                  example:
+                    - "0x407d73d8a49eeb85d32cf465507dd71d507100c1"
+                    - "latest"
+                id:
+                  type: integer
+                  example: 1
+                  description: Request identifier.
+      responses:
+        '200':
+          description: Contract bytecode in hex format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version.
+                  id:
+                    type: integer
+                    example: 1
+                    description: Request ID.
+                  result:
+                    type: string
+                    description: |
+                      The contract bytecode as a hex string (0x-prefixed).
+                      Returns "0x" if no contract code is found at the address.
+                    example: "0x6080604052348015600f57600080fd5b5060..."
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

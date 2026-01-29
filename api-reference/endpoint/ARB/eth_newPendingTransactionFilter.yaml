@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_newPendingTransactionFilter
+      summary: Create a filter for pending transactions
+      operationId: ethNewPendingTransactionFilter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  description: JSON-RPC version
+                  example: "2.0"
+                method:
+                  type: string
+                  description: JSON-RPC method name
+                  example: "eth_newPendingTransactionFilter"
+                params:
+                  type: array
+                  description: No parameters required for this method
+                  example: []
+                  items: {}
+                id:
+                  type: integer
+                  description: Request identifier
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_newPendingTransactionFilter"
+                  params: []
+                  id: 1
+      responses:
+        "200":
+          description: Filter ID created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    description: JSON-RPC version
+                    example: "2.0"
+                  id:
+                    type: integer
+                    description: Request ID (matches the one from the request)
+                    example: 1
+                  result:
+                    type: string
+                    description: Filter identifier (hex string)
+                    example: "0x16"
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: "0x16"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

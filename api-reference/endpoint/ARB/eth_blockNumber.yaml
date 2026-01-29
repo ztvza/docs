@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_blockNumber
+      summary: Ethereum method - eth_blockNumber
+      description: Returns the number of the latest block on the chain in hexadecimal format.
+      operationId: ethBlockNumber
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: The JSON-RPC protocol version
+                method:
+                  type: string
+                  example: "eth_blockNumber"
+                  description: Name of the method being called
+                params:
+                  type: array
+                  example: []
+                  description: This method does not take parameters; always send an empty array.
+                id:
+                  type: integer
+                  example: 1
+                  description: A unique ID for the request
+      responses:
+        '200':
+          description: The latest block number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version used in the response
+                  id:
+                    type: integer
+                    example: 1
+                    description: ID that matches the original request
+                  result:
+                    type: string
+                    example: "0x10d4f"  # Example: 68943 in decimal
+                    description: |
+                      The block number of the latest block, represented as a hexadecimal string.
+                      Example: "0x10d4f" equals 68943 in decimal.
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

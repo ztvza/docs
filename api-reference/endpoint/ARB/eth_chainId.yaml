@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_chainId
+      summary: Ethereum method - eth_chainId
+      description: Returns the hexadecimal string of the current chain ID.
+      operationId: ethChainId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC protocol version
+                method:
+                  type: string
+                  example: "eth_chainId"
+                  description: Name of the method to call
+                params:
+                  type: array
+                  description: This method does not require parameters. Use an empty array.
+                  example: []
+                id:
+                  type: integer
+                  description: Unique identifier for the request
+                  example: 1
+      responses:
+        '200':
+          description: Chain ID response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC protocol version
+                  id:
+                    type: integer
+                    example: 1
+                    description: ID matching the request
+                  result:
+                    type: string
+                    description: |
+                      The chain ID in hexadecimal string format.
+                      For example: "0x1" = Ethereum mainnet, "0x3" = Ropsten, "0x5" = Goerli, etc.
+                    example: "0x1"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

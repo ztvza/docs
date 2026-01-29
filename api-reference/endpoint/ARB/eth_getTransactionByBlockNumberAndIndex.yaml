@@ -1,0 +1,140 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getTransactionByBlockNumberAndIndex
+      summary: Get Transaction by Block Number and Index
+      operationId: ethGetTransactionByBlockNumberAndIndex
+      description: |
+        Returns the information about a transaction using the block number and the transaction index within the block.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            examples:
+              RealExample:
+                summary: Example request
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_getTransactionByBlockNumberAndIndex"
+                  params:
+                    - "0x5daf3b"
+                    - "0x0"
+                  id: 1
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_getTransactionByBlockNumberAndIndex"
+                params:
+                  type: array
+                  description: |
+                    Parameters:
+                    1. Block number in hex format (e.g., "0x5daf3b")
+                    2. Transaction index in the block (e.g., "0x0")
+                  items:
+                    type: string
+                  minItems: 2
+                  maxItems: 2
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: A transaction object, or `null` if not found.
+          content:
+            application/json:
+              examples:
+                RealResponse:
+                  summary: Example response
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result:
+                      hash: "0x3f1c7f9e684bbd292f3b849df4c03ff4ffbd83ad2c6cb136a20ee2ebded7df72"
+                      nonce: "0x15"
+                      blockHash: "0xb3b20624a42dffdf1af8e8a6c9b338360585cc309831785f2138e1f9c35a1f09"
+                      blockNumber: "0x5daf3b"
+                      transactionIndex: "0x0"
+                      from: "0x407d73d8a49eeb85d32cf465507dd71d507100c1"
+                      to: "0x85h1c2d44cf8531a24b1030f78134677856f7b9f"
+                      value: "0x7f110"
+                      gas: "0x5208"
+                      gasPrice: "0x4a817c800"
+                      input: "0x"
+                      type: "0x0"
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    oneOf:
+                      - type: object
+                        properties:
+                          hash:
+                            type: string
+                            description: Hash of the transaction.
+                          nonce:
+                            type: string
+                            description: Number of transactions sent by the sender.
+                          blockHash:
+                            type: string
+                            description: Hash of the block this transaction was included in.
+                          blockNumber:
+                            type: string
+                            description: Number of the block this transaction was included in.
+                          transactionIndex:
+                            type: string
+                            description: Index of this transaction in the block.
+                          from:
+                            type: string
+                            description: Address the transaction is sent from.
+                          to:
+                            type: string
+                            description: Address the transaction is directed to.
+                          value:
+                            type: string
+                            description: Value transferred in wei.
+                          gas:
+                            type: string
+                            description: Gas provided by the sender.
+                          gasPrice:
+                            type: string
+                            description: Gas price provided by the sender in wei.
+                          input:
+                            type: string
+                            description: Data sent along with the transaction.
+                          type:
+                            type: string
+                            description: Transaction type (e.g., "0x0" for legacy).
+                      - type: string
+                        enum: [null]
+                        description: Null if no transaction found.
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_accounts
+      summary: Ethereum method - eth_accounts
+      description: Returns an array of addresses controlled by the client.
+      operationId: ethAccounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jsonrpc, method, params, id]
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                  description: JSON-RPC version identifier
+                method:
+                  type: string
+                  example: "eth_accounts"
+                  description: Name of the JSON-RPC method
+                params:
+                  type: array
+                  example: []
+                  description: |
+                    No parameters are required for this method. This must be an empty array.
+                id:
+                  type: integer
+                  example: 1
+                  description: Unique identifier for the JSON-RPC request
+      responses:
+        '200':
+          description: A list of Ethereum addresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                    description: JSON-RPC version identifier
+                  id:
+                    type: integer
+                    example: 1
+                    description: ID matching the request
+                  result:
+                    type: array
+                    description: |
+                      An array of hexadecimal Ethereum addresses controlled by the node.
+                    items:
+                      type: string
+                      format: eth-address
+                      example: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key

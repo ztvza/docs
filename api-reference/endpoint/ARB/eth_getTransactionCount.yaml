@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: Ethereum JSON-RPC
+  version: 1.0.0
+
+servers:
+  - url: https://arbitrum.nownodes.io
+
+security:
+  - api-keyAuth: []
+
+paths:
+  /:
+    post:
+      tags:
+        - eth_getTransactionCount
+      summary: Get transaction count (nonce) for address
+      operationId: ethGetTransactionCount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - method
+                - params
+                - id
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                method:
+                  type: string
+                  example: "eth_getTransactionCount"
+                params:
+                  type: array
+                  description: |
+                    - address: The address to check for transaction count.
+                    - block: The block parameter (e.g., "latest", "earliest", "pending").
+                  items:
+                    type: string
+                    format: hex
+                  minItems: 2
+                  maxItems: 2
+                  example:
+                    - "0x742d35cc6634c0532925a3b844bc454e4438f44e"
+                    - "latest"
+                id:
+                  type: integer
+                  example: 1
+            examples:
+              ExampleRequest:
+                value:
+                  jsonrpc: "2.0"
+                  method: "eth_getTransactionCount"
+                  params:
+                    - "0x742d35cc6634c0532925a3b844bc454e4438f44e"
+                    - "latest"
+                  id: 1
+      responses:
+        "200":
+          description: Hex encoded nonce (transaction count)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: string
+                    format: hex
+                    description: |
+                      Number of transactions sent from the address, encoded as hexadecimal (nonce).
+              examples:
+                ExampleResponse:
+                  value:
+                    jsonrpc: "2.0"
+                    id: 1
+                    result: "0xa3"  # decimal 163
+
+components:
+  securitySchemes:
+    api-keyAuth:
+      type: apiKey
+      in: header
+      name: api-key
