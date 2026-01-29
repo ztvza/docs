@@ -118,6 +118,71 @@
                 "openapi": "/api-reference/endpoint/ALGO/kmd.yaml"
               }
             ]
+          },
+          {
+            "group": "ALPH",
+            "pages": [
+              {
+                "group": "APLH API",
+                "openapi": "/api-reference/endpoint/ALPH/node.yaml"
+              }
+            ]
+          },
+          {
+            "group": "APT",
+            "pages": [
+              {
+                "group": "APLH API",
+                "openapi": "/api-reference/endpoint/APT/node.yaml"
+              }
+            ]
+          },
+          {
+            "group": "Atom",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/ATOM/cosmos.yml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/ATOM/tendermint.yaml"
+              }
+            ]
+          },
+          {
+            "group": "AXL",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/AXL/axelar.yml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/AXL/cosmos.yml"
+              },
+              {
+                "group": "Ibc API",
+                "openapi": "/api-reference/endpoint/AXL/ibc.yaml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/AXL/tendermint.yaml"
+              }
+            ]
+          },
+          {
+            "group": "Baby",
+            "pages": [
+              {
+                "group": "Cosmos API",
+                "openapi": "/api-reference/endpoint/BABY/cosmos.yml"
+              },
+              {
+                "group": "Tendermint API",
+                "openapi": "/api-reference/endpoint/BABY/tendermint.yaml"
+              }
+            ]
           }
         ]
       }
