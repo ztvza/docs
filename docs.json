@@ -101,6 +101,23 @@
                 "openapi": "/api-reference/endpoint/ADA/rosetta.yaml"
               }
             ]
+          },
+          {
+            "group": "ALGO",
+            "pages": [
+              {
+                "group": "Algog API",
+                "openapi": "/api-reference/endpoint/ALGO/algod.yml"
+              },
+              {
+                "group": "Indexer API",
+                "openapi": "/api-reference/endpoint/ALGO/indexer.yml"
+              },
+              {
+                "group": "KMD API",
+                "openapi": "/api-reference/endpoint/ALGO/kmd.yml"
+              }
+            ]
           }
         ]
       }
